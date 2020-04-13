@@ -75,6 +75,21 @@ public class ObjectsManager {
             }
         }
     }
+    public void changePlayerSpeed(int speed)
+    {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                ((Player) obj).changeSpeed(speed);
+            }
+        }
+    }
+    public void changeBallSpeed() {
+        for (Object obj : objects) {
+            if (obj instanceof Ball) {
+                ((Ball) obj).changeVelY();
+            }
+        }
+    }
     public void destroyAllBricks()
     {
         for (GameObject obj : objects) {
@@ -105,7 +120,7 @@ public class ObjectsManager {
     {
         int val=(int)(Math.random()*100);
         if(val<30) {
-            int val2 = (int) (Math.random() * 3);
+            int val2 = (int) (Math.random() * 5);
             switch (val2) {
                 case 0:
                     addObject(new MagicObject(game, x, y, MagicObject.Type.bigger));
@@ -116,7 +131,23 @@ public class ObjectsManager {
                 case 2:
                     addObject(new MagicObject(game, x, y, MagicObject.Type.reverse));
                     break;
+                case 3:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.slower));
+                    break;
+                case 4:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.faster));
+                    break;
             }//de sters obiectele magice atunci cand treci un nivel
+        }
+    }
+    public void destroyAllBonuses()
+    {
+        for(GameObject obj: objects)
+        {
+            if(obj.getTag().equals("magic"))
+            {
+                obj.setDead(true);
+            }
         }
     }
 }

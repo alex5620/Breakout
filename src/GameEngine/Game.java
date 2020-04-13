@@ -131,6 +131,7 @@ public class Game {
                 }
                 else {
                     if(level<5) {
+                        objectsManager.destroyAllBonuses();
                         ++level;
                         levelPassed = true;
                         LoadNewLevel();

@@ -117,4 +117,17 @@ public class Player extends GameObject {
             }
         }
     }
+    public void changeSpeed(int speed)
+    {
+        if(speed>0 && this.speed<8) {
+            this.speed += speed;
+        }
+        else
+        {
+            if(this.speed>=4)
+            {
+                this.speed+=speed;
+            }
+        }
+    }
 }

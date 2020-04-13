@@ -24,6 +24,8 @@ public class ImagesLoader {
     private Image reverseImage;
     private Image biggerImage;
     private Image smallerImage;
+    private Image slowImage;
+    private Image fastImage;
     private final int brickImagesNumber=10;
     public ImagesLoader()
     {
@@ -62,6 +64,8 @@ public class ImagesLoader {
         reverseImage=new Image("/Resources/reverse.png");
         biggerImage=new Image("/Resources/bigger.png");
         smallerImage=new Image("/Resources/smaller.png");
+        slowImage=new Image("/Resources/slow.png");
+        fastImage=new Image("/Resources/fast.png");
     }
     public Image getBallImage() {
         return ballImage;
@@ -98,4 +102,6 @@ public class ImagesLoader {
     public Image getReverseImage(){ return reverseImage; }
     public Image getBiggerImage() { return biggerImage; }
     public Image getSmallerImage() { return smallerImage; }
+    public Image getSlowImage() { return slowImage; }
+    public Image getFastImage() { return fastImage; }
 }

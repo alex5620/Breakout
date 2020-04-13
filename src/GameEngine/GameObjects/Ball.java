@@ -115,4 +115,8 @@ public class Ball extends GameObject {
         this.velY=-5;//-5;
         move=false;
     }
+    public void changeVelY()
+    {
+        velY+=velY/Math.abs(velY);
+    }
 }
