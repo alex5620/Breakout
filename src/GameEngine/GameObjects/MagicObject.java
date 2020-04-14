@@ -27,6 +27,8 @@ public class MagicObject extends GameObject {
 
     @Override
     public void update(Game gc, float dt) {
+        if(game.getState()== Game.STATE.pause)
+            return;
         posY+=2;
     }
     @Override

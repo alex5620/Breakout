@@ -42,6 +42,8 @@ public class Menu {
         }
         if(mstate ==MSTATE.SETTINGS_MENU)
         {
+            int x=input.getX();
+            int y=input.getY();
             renderer.drawImage(gameEngine.getImagesLoader().getSettingsMenuImage(), 0, 0);
             renderer.drawText("Set Name:", 195, 208, 0xffff0606);
             renderer.drawText(name, 190, 235, 0xffff0606);
@@ -49,12 +51,25 @@ public class Menu {
             {
                 renderer.drawImage(gameEngine.getImagesLoader().getBack_ResetImage(), 635, 565);
             }
+            if ((x > 200) && (x < 550) && (y > 280) && (y < 590)) {
+                if (x < 375 || y < 550) {
+                    int sx = x - 185;
+                    int sy = y - 283;
+                    sx = sx / 96;
+                    sy = sy / 45;
+                    renderer.drawImage(gameEngine.getImagesLoader().getLetterImage(), 208 + sx * 92, 280 + sy * 44);
+                }
+                else
+                {
+                    renderer.drawImage(gameEngine.getImagesLoader().getDeleteImage(), 390, 542);
+                }
+            }
         }
         if(mstate ==MSTATE.HIGHSCORE_MENU)
         {
             renderer.drawImage(gameEngine.getImagesLoader().getHighscoresMenuImage(), 0, 0);
             renderer.drawText("High scores", 252, 175, 0xffff0606);
-            renderer.drawText("Pos   Name        Score", 150, 230, 0xffff0606);
+            renderer.drawText(" Pos      Name                             Score", 150, 230, 0xffff0606);
             try {
                 ResultSet rs = highscores.displayUsers();
                 int i = 1;
@@ -90,7 +105,7 @@ public class Menu {
                 sy = sy / 45;
                 car += sx + 4 * sy;
                 if (car <= 'Z') {
-                    if (name.length() < 10)
+                    if (name.length() < 11)
                         name += car;
                 } else {
                     if (name.length() > 0) {

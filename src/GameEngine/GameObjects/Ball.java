@@ -23,6 +23,10 @@ public class Ball extends GameObject {
 
     @Override
     public void update(Game game, float dt) {
+        if(game.getState()== Game.STATE.pause)
+        {
+            return;
+        }
         if(game.getInput().isKey(KeyEvent.VK_SPACE))
         {
             if(game.getLevelPassed()==false) {//bug aparut, nu functioneaza fara
@@ -47,7 +51,7 @@ public class Ball extends GameObject {
         }*/
         if(move)
         {
-            checkForBoundaries();
+                checkForBoundaries();
         }
         else
         {

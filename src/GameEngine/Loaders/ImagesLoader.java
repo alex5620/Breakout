@@ -31,6 +31,11 @@ public class ImagesLoader {
     private Image bonus_100_Image;
     private Image bonus_250_Image;
     private Image bonus_500_Image;
+    private Image letterImage;
+    private Image deleteImage;
+    private Image pauseImage;
+    private Image exitImage;
+    private Image exit2Image;
     private final int brickImagesNumber=10;
     public ImagesLoader()
     {
@@ -76,6 +81,11 @@ public class ImagesLoader {
         bonus_100_Image=new Image("/Resources/100.png");
         bonus_250_Image=new Image("/Resources/250.png");
         bonus_500_Image=new Image("/Resources/500.png");
+        letterImage=new Image("/Resources/letter.png");
+        deleteImage=new Image("/Resources/delete.png");
+        pauseImage=new Image("/Resources/pause.png");
+        exitImage=new Image("/Resources/exit.png");
+        exit2Image=new Image("/Resources/exit2.png");
     }
     public Image getBallImage() {
         return ballImage;
@@ -117,4 +127,9 @@ public class ImagesLoader {
     public Image getBonus_100_Image() { return bonus_100_Image; }
     public Image getBonus_250_Image() { return bonus_250_Image; }
     public Image getBonus_500_Image() { return bonus_500_Image; }
+    public Image getLetterImage() { return letterImage; }
+    public Image getDeleteImage() { return deleteImage; }
+    public Image getPauseImage() { return pauseImage; }
+    public Image getExitImage() { return exitImage; }
+    public Image getExit2Image() { return exit2Image; }
 }

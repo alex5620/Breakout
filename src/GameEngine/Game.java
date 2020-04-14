@@ -17,7 +17,7 @@ public class Game {
     private int score;
     private boolean lost, levelPassed;
     private int level;
-    public enum STATE{playing, lost, won};
+    public enum STATE{playing, lost, won, pause};
     private STATE gstate;
     public Game(GameEngine engine)
     {
@@ -38,47 +38,69 @@ public class Game {
         score=0;
     }
     public void update(float dt) {
+        if (gstate != STATE.pause) {
             objectsManager.update(dt);
             checkIfLevelPassed();
             checkIfLost();
             input.update();
             collider.update();
-            if(gstate==STATE.lost && gameEngine.getMenu().pressCondition())
-            {
-                int x=gameEngine.getMenu().getInput().getX();
-                int y=gameEngine.getMenu().getInput().getY();
-                if((x>272) && (x<470) && (y>217) && (y<270))
-                {
-                    gstate=STATE.playing;
+            if (gstate == STATE.lost && gameEngine.getMenu().pressCondition()) {
+                int x = gameEngine.getMenu().getInput().getX();
+                int y = gameEngine.getMenu().getInput().getY();
+                if ((x > 272) && (x < 470) && (y > 217) && (y < 270)) {
+                    gstate = STATE.playing;
                     restartGame();
                 }
-                if((x>230) && (x<520) && (y>295) && (y<348))
-                {
+                if ((x > 230) && (x < 520) && (y > 295) && (y < 348)) {
                     gameEngine.setState(GameEngine.STATE.MENU);
-                    gstate=STATE.playing;
-                    lost=false;
+                    gstate = STATE.playing;
+                    lost = false;
                 }
                 gameEngine.getMenu().setPressed(false);
             }
-            if(gstate==STATE.won)
-            {
-                int x=gameEngine.getMenu().getInput().getX();
-                int y=gameEngine.getMenu().getInput().getY();
+            if (gstate == STATE.won) {
+                int x = gameEngine.getMenu().getInput().getX();
+                int y = gameEngine.getMenu().getInput().getY();
                 objectsManager.destroyAllObjects();
-                lost=false;
-                levelPassed=false;
-                if((x>250) && (x<505) && (y>386) && (y<441) && gameEngine.getMenu().pressCondition())
-                {
+                lost = false;
+                levelPassed = false;
+                if ((x > 250) && (x < 505) && (y > 386) && (y < 441) && gameEngine.getMenu().pressCondition()) {
                     System.out.println("Cevaaaaaaaaa");
-                    gstate=STATE.playing;
+                    gstate = STATE.playing;
                     gameEngine.setState(GameEngine.STATE.MENU);
                 }
                 gameEngine.getMenu().setPressed(false);
             }
+        }
+        else
+        {
+            objectsManager.update(dt);
+            input.update();
+            if(gameEngine.getMenu().getInput().getX()>619 && gameEngine.getMenu().getInput().getY()>580)
+                if(gameEngine.getMenu().pressCondition())
+                {
+                    gameEngine.getMenu().updateHighscores(score);
+                    objectsManager.destroyAllObjects();
+                    objectsManager.update(0);
+                    gstate=STATE.playing;
+                    gameEngine.setState(GameEngine.STATE.MENU);
+                    gameEngine.getMenu().setPressed(true);
+                }
+        }
     }
-    public void render()
-    {
-        if(gstate==STATE.playing) {
+    public void render() {
+        if(gstate==STATE.pause)
+        {
+            renderer.drawImage(gameEngine.getImagesLoader().getBackgroundImage(), 0, 0);
+            renderer.drawImage(gameEngine.getImagesLoader().getPauseImage(), 120, 70);
+            renderer.drawImage(gameEngine.getImagesLoader().getExitImage(), 619, 580);
+            if(gameEngine.getMenu().getInput().getX()>619 && gameEngine.getMenu().getInput().getY()>580)
+                renderer.drawImage(gameEngine.getImagesLoader().getExit2Image(), 614, 575);
+            objectsManager.render();
+            printLevel_Score();
+            renderPlayerLives();
+        }
+        if (gstate == STATE.playing) {
             renderer.drawImage(gameEngine.getImagesLoader().getBackgroundImage(), 0, 0);
             objectsManager.render();
             if (!lost) {
@@ -111,10 +133,9 @@ public class Game {
             int x=gameEngine.getMenu().getInput().getX();
             int y=gameEngine.getMenu().getInput().getY();
             renderer.drawImage(gameEngine.getImagesLoader().getWonImage(), 0, 0);
-            renderer.drawText("Your score: "+score , 225, 210, 0xffff0606);
+            renderer.drawText("Your score: "+score , 250, 210, 0xffff0606);
             if(score>gameEngine.getMenu().getMinimumScore())
-                renderer.drawText("Congrats, you are in top 10!" , 100, 280, 0xffff0606);
-            renderer.drawText("Your score: "+score , 225, 210, 0xffff0606);
+                renderer.drawText("Congrats, you are in top 10!" , 160, 280, 0xffff0606);
             if((x>250) && (x<505) && (y>386) && (y<441))
             {
             renderer.drawImage(gameEngine.getImagesLoader().getBackToMenu2Image(), 248, 386);
@@ -149,18 +170,18 @@ public class Game {
     }
     public void printLoseMessage(Renderer renderer)
     {
-        renderer.drawText("GAME OVER", 275, 60, 0xff0000ff);
-        renderer.drawText(" SCORE: " + score, 280, 100, 0xff0000ff);
+        renderer.drawText("    GAME OVER", 275, 60, 0xff0000ff);
+        renderer.drawText("     SCORE: " + score, 280, 100, 0xff0000ff);
     }
     public void printLevelPassedMessage()
     {
-        renderer.drawText("Level" + level, 300, 200, 0xff000000);
-        renderer.drawText("Press enter to continue ", 150, 250, 0xff000000);
+        renderer.drawText("Level" + level, 320, 200, 0xff0000ff);
+        renderer.drawText("Press enter to continue ", 180, 250, 0xff0000ff);
     }
     public void printLevel_Score()
     {
-        renderer.drawText("Level" + level, 50, 5, 0xffff0000);
-        renderer.drawText("SCORE:" + score, 600, 5, 0xffff0000);
+        renderer.drawText("Level" + level, 30, 6, 0xffff0000);
+        renderer.drawText("SCORE:" + score, 600, 7, 0xffff0000);
     }
     public KeyboardInput getInput() {
         return input;
@@ -190,7 +211,7 @@ public class Game {
     {
         int lives=objectsManager.getPlayerLives();
         for(int i=0;i<lives;++i) {
-            renderer.drawImage(gameEngine.getImagesLoader().getHeartImage(), 165+i*20, 14);
+            renderer.drawImage(gameEngine.getImagesLoader().getHeartImage(), 135+i*20, 14);
         }
     }
     public void changePlayerLifes(int life)
@@ -222,5 +243,18 @@ public class Game {
     public void increaseScore(int score)
     {
         this.score+=score;
+    }
+    public void setPause()
+    {
+        if(gstate==STATE.playing && levelPassed!=true)
+            gstate=STATE.pause;
+        else {
+            if (gstate == STATE.pause)
+                   gstate = STATE.playing;
+        }
+    }
+    public STATE getState()
+    {
+        return gstate;
     }
 }

@@ -157,6 +157,8 @@ public class ObjectsManager {
     }
     public void generateMagicObjects(int x, int y)
     {
+        if(game.getState()== Game.STATE.pause)
+            return;
         int val=(int)(Math.random()*100);
         if(val<20) {
             int val2 = (int) (Math.random() * 9);

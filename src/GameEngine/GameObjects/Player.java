@@ -29,56 +29,42 @@ public class Player extends GameObject {
     public void update(Game game, float dt) {
         if(game.getInput().isKeyUp(KeyEvent.VK_P))//Pauza joc
         {
-            /*if(gc.isRunning()) {
-                gc.stop();
+            game.setPause();
+        }
+        if(game.getState()== Game.STATE.pause) {
+            return;
+        }
+            if (game.getInput().isKey(KeyEvent.VK_LEFT)) {
+                if (reversedMovement)
+                    posX += speed;
+                else
+                    posX -= speed;
+                if (posX <= 0) {
+                    posX = 0;
+                }
+                if (posX >= (limit - width)) {
+                    posX = limit - width;
+                }
             }
-            else
-            {
-                gc.start();
-            }*/
-        }
-        if(game.getInput().isKey(KeyEvent.VK_LEFT))
-        {
-            if(reversedMovement)
-                posX +=speed;
-            else
-                posX -=speed;
-            if(posX <=0)
-            {
-                posX =0;
+            if (game.getInput().isKeyUp(KeyEvent.VK_U)) {
+                System.out.println("Game reinitialized");
+                game.reinitializeGame();
             }
-            if(posX >=(limit-width))
-            {
-                posX =limit-width;
+            if (game.getInput().isKey(KeyEvent.VK_ENTER)) {
+                game.setLeveLPassed(false);
             }
-        }
-        if(game.getInput().isKeyUp(KeyEvent.VK_U))
-        {
-            System.out.println("Game reinitialized");
-            game.reinitializeGame();
-        }
-        if(game.getInput().isKey(KeyEvent.VK_ENTER))
-        {
-            game.setLeveLPassed(false);
-        }
-        if(game.getInput().isKey(KeyEvent.VK_RIGHT)) {
-            if(reversedMovement)
-                posX-=speed;
-            else
-               posX +=speed;
-            if(posX >=(limit-width))
-            {
-                posX =limit-width;
+            if (game.getInput().isKey(KeyEvent.VK_RIGHT)) {
+                if (reversedMovement)
+                    posX -= speed;
+                else
+                    posX += speed;
+                if (posX >= (limit - width)) {
+                    posX = limit - width;
+                }
+                if (posX <= 0) {
+                    posX = 0;
+                }
             }
-            if(posX <=0)
-            {
-                posX =0;
-            }
-        }
-        if(game.getInput().isKey(KeyEvent.VK_P))
-        {
-            //game.restartGame();
-        }
     }
     @Override
     public void render(Game game, Renderer r) {
