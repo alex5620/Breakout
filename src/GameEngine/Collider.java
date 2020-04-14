@@ -54,7 +54,7 @@ public class Collider {
         Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY() + 7, player.getWidth(), 1);
         if (ballRectangle.intersects(playerRectangle)) {
             resetHits();
-            if (!playerBallDetectionY && (ball.getPosX() + ball.getWidth() > playerRectangle.x + 2) && (ball.getPosX() < (playerRectangle.x + playerRectangle.width) - 2)) {
+            if (!playerBallDetectionY && (ball.getPosX() + ball.getWidth() > playerRectangle.x -2) && (ball.getPosX() < (playerRectangle.x + playerRectangle.width) + 2)) {
                 ((Ball) ball).reverseVelY();
                 if (ball.getPosX() + ball.getWidth() < player.getPosX() + player.getWidth() / 2) {
                     ((Ball) ball).decrementVelX();

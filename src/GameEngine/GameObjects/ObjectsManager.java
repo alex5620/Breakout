@@ -59,6 +59,21 @@ public class ObjectsManager {
             }
         }
     }
+    public int getPlayerLives() {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                return ((Player) obj).getLives();
+            }
+        }
+        return 0;//linia asta n ar trebuie sa fie
+    }
+    public void changePlayerLives(int life) {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                ((Player) obj).changeLivesNo(life);
+            }
+        }
+    }
     public void setReversedMovement()
     {
         for (Object obj : objects) {
@@ -90,6 +105,30 @@ public class ObjectsManager {
             }
         }
     }
+    public int getPlayerX() {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                return ((Player) obj).getPosX();
+            }
+        }
+        return 0;
+    }
+    public int getPlayerY() {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                return ((Player) obj).getPosY();
+            }
+        }
+        return 0;
+    }
+    public int getPlayerWidth() {
+        for (Object obj : objects) {
+            if (obj instanceof Player) {
+                return ((Player) obj).getWidth();
+            }
+        }
+        return 0;
+    }
     public void destroyAllBricks()
     {
         for (GameObject obj : objects) {
@@ -119,8 +158,8 @@ public class ObjectsManager {
     public void generateMagicObjects(int x, int y)
     {
         int val=(int)(Math.random()*100);
-        if(val<30) {
-            int val2 = (int) (Math.random() * 5);
+        if(val<20) {
+            int val2 = (int) (Math.random() * 9);
             switch (val2) {
                 case 0:
                     addObject(new MagicObject(game, x, y, MagicObject.Type.bigger));
@@ -137,6 +176,18 @@ public class ObjectsManager {
                 case 4:
                     addObject(new MagicObject(game, x, y, MagicObject.Type.faster));
                     break;
+                case 5:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.life));
+                    break;
+                case 6:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus100));
+                    break;
+                case 7:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus250));
+                    break;
+                case 8:
+                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus500));
+                break;
             }//de sters obiectele magice atunci cand treci un nivel
         }
     }

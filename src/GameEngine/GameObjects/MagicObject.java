@@ -7,7 +7,7 @@ import GameEngine.Renderer;
 public class MagicObject extends GameObject {
     Game game;
     private Image objectImage;
-    enum Type{reverse, smaller, bigger, slower, faster};
+    enum Type{reverse, smaller, bigger, slower, faster, life, bonus100, bonus250, bonus500};
     private Type type;
     public MagicObject(Game game, int posX, int posY, Type type)
     {
@@ -44,6 +44,14 @@ public class MagicObject extends GameObject {
             case slower: objectImage=game.getImagesLoader().getSlowImage();
                 break;
             case faster: objectImage=game.getImagesLoader().getFastImage();
+                break;
+            case life: objectImage=game.getImagesLoader().getLifeImage();
+                break;
+            case bonus100: objectImage=game.getImagesLoader().getBonus_100_Image();
+                break;
+            case bonus250: objectImage=game.getImagesLoader().getBonus_250_Image();
+                break;
+            case bonus500: objectImage=game.getImagesLoader().getBonus_500_Image();
         }
     }
     public void execute()
@@ -64,6 +72,18 @@ public class MagicObject extends GameObject {
             case faster:
                 game.getObjectsManager().changePlayerSpeed(1);
                 game.getObjectsManager().changeBallSpeed();
+                break;
+            case life:
+                game.getObjectsManager().changePlayerLives(1);
+                break;
+            case bonus100:
+                game.increaseScore(100);
+                break;
+            case bonus250:
+                game.increaseScore(250);
+                break;
+            case bonus500:
+                game.increaseScore(500);
                 break;
         }
     }

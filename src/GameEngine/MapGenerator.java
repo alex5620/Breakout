@@ -44,7 +44,7 @@ public class MapGenerator {
                     brickImage[0] = game.getImagesLoader().getBrickImage(1);
                     brickImage[1]=game.getImagesLoader().getBrickImage(6);
                 }
-                game.getObjectsManager().getObjects().add(new Brick((j*width+24+j*5), i*height+60+i*5, brickImage, 2));
+                game.getObjectsManager().getObjects().add(new Brick((j*width+14+j*5), i*height+60+i*5, brickImage, 1));
             }
         }
     }
@@ -75,7 +75,7 @@ public class MapGenerator {
                     }
                     val=1;
                 }
-                game.getObjectsManager().getObjects().add(new Brick((j*width+24), i*height+60, brickImage, val));
+                game.getObjectsManager().getObjects().add(new Brick((j*width+14+j*5),  i*height+60+i*5, brickImage, val));
             }
         }
     }
@@ -115,7 +115,7 @@ public class MapGenerator {
                         }
                     }
                 }
-                game.getObjectsManager().getObjects().add(new Brick((j*width+24), i*height+60, brickImage, val));
+                game.getObjectsManager().getObjects().add(new Brick((j*width+14+j*5), i*height+60+i*5, brickImage, val));
             }
         }
     }
@@ -153,7 +153,7 @@ public class MapGenerator {
                         }
                     }
                 }
-                game.getObjectsManager().getObjects().add(new Brick((j*width+24), i*height+60, brickImage, val));
+                game.getObjectsManager().getObjects().add(new Brick((j*width+14+j*5), i*height+60+i*5, brickImage, val));
             }
         }
     }
@@ -185,7 +185,7 @@ public class MapGenerator {
                         brickImage[1] = game.getImagesLoader().getBrickImage(6);
                     }
                 }
-                game.getObjectsManager().getObjects().add(new Brick((j*width+24), i*height+60, brickImage, val));
+                game.getObjectsManager().getObjects().add(new Brick((j*width+14+j*5), i*height+60+i*5, brickImage, val));
             }
         }
     }

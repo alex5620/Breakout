@@ -12,6 +12,7 @@ public class Player extends GameObject {
     private int speed=5;
     private int size;
     boolean reversedMovement;
+    int lives;
     public Player(Game game){
         this.game = game;
         this.tag="player";
@@ -22,6 +23,7 @@ public class Player extends GameObject {
         this.width=objectImage[size-1].getWidth();
         this.height=objectImage[size-1].getHeight();
         reversedMovement=false;
+        lives=1;
     }
     @Override
     public void update(Game game, float dt) {
@@ -129,5 +131,13 @@ public class Player extends GameObject {
                 this.speed+=speed;
             }
         }
+    }
+    public int getLives()
+    {
+        return lives;
+    }
+    public void changeLivesNo(int life)
+    {
+        lives+=life;
     }
 }

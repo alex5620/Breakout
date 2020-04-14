@@ -26,6 +26,11 @@ public class ImagesLoader {
     private Image smallerImage;
     private Image slowImage;
     private Image fastImage;
+    private Image heartImage;
+    private Image lifeImage;
+    private Image bonus_100_Image;
+    private Image bonus_250_Image;
+    private Image bonus_500_Image;
     private final int brickImagesNumber=10;
     public ImagesLoader()
     {
@@ -66,15 +71,18 @@ public class ImagesLoader {
         smallerImage=new Image("/Resources/smaller.png");
         slowImage=new Image("/Resources/slow.png");
         fastImage=new Image("/Resources/fast.png");
+        heartImage=new Image("/Resources/heart.png");
+        lifeImage=new Image("/Resources/life.png");
+        bonus_100_Image=new Image("/Resources/100.png");
+        bonus_250_Image=new Image("/Resources/250.png");
+        bonus_500_Image=new Image("/Resources/500.png");
     }
     public Image getBallImage() {
         return ballImage;
     }
-
     public Image[] getPlayerImages() {
         return playerImage;
     }
-
     public Image getBrickImage(int index) {
         return brickImage[index];
     }
@@ -104,4 +112,9 @@ public class ImagesLoader {
     public Image getSmallerImage() { return smallerImage; }
     public Image getSlowImage() { return slowImage; }
     public Image getFastImage() { return fastImage; }
+    public Image getHeartImage() { return heartImage; }
+    public Image getLifeImage() { return lifeImage; }
+    public Image getBonus_100_Image() { return bonus_100_Image; }
+    public Image getBonus_250_Image() { return bonus_250_Image; }
+    public Image getBonus_500_Image() { return bonus_500_Image; }
 }

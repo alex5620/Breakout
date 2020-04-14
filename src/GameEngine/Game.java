@@ -40,6 +40,7 @@ public class Game {
     public void update(float dt) {
             objectsManager.update(dt);
             checkIfLevelPassed();
+            checkIfLost();
             input.update();
             collider.update();
             if(gstate==STATE.lost && gameEngine.getMenu().pressCondition())
@@ -83,6 +84,7 @@ public class Game {
             if (!lost) {
                 if (!levelPassed) {
                     printLevel_Score();
+                    renderPlayerLives();
                 } else {
                     if(gstate!=STATE.won)
                         printLevelPassedMessage();
@@ -184,6 +186,17 @@ public class Game {
             lost=false;
         }
     }
+    private void renderPlayerLives()
+    {
+        int lives=objectsManager.getPlayerLives();
+        for(int i=0;i<lives;++i) {
+            renderer.drawImage(gameEngine.getImagesLoader().getHeartImage(), 165+i*20, 14);
+        }
+    }
+    public void changePlayerLifes(int life)
+    {
+        objectsManager.changePlayerLives(life);
+    }
     public void generateMap() { MapGenerator.generateMap(this,level);}
     public void reinitializeGame() {
         objectsManager.destroyAlmostAllBricks();
@@ -199,4 +212,15 @@ public class Game {
     public boolean getLost() { return lost; }
     public int getScore() { return score; }
     public Collider getCollider() { return collider; }
+    public void checkIfLost()
+    {
+        if(gstate!=STATE.won && objectsManager.getPlayerLives()==0)
+        {
+            setLost(true);
+        }
+    }
+    public void increaseScore(int score)
+    {
+        this.score+=score;
+    }
 }

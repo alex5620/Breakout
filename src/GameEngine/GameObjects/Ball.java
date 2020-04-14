@@ -15,10 +15,10 @@ public class Ball extends GameObject {
     public Ball(Game game) {
         this.game = game;
         this.tag = "ball";
-        setToInitialPosition();
         this.objectImage = game.getImagesLoader().getBallImage();
         this.width=objectImage.getWidth();
         this.height=objectImage.getHeight();
+        setToInitialPosition();
     }
 
     @Override
@@ -90,18 +90,22 @@ public class Ball extends GameObject {
         }
         if  (posY>limit)
         {
-            game.setLost(true);
-            dead=true;
+            game.changePlayerLifes(-1);
+            setToInitialPosition();
+            //game.setLost(true);
+            //dead=true;
         }
 
     }
     public void incrementVelX()
     {
-        ++velX;
+        if(velX<=4)
+            ++velX;
     }
     public void decrementVelX()
     {
-        --velX;
+        if(velX>=-4)
+            --velX;
     }
     @Override
     public void render(Game gc, Renderer r) {
@@ -111,6 +115,9 @@ public class Ball extends GameObject {
     {
         this.posX = 340;
         this.posY = 519;
+        //this.posX=game.getObjectsManager().getPlayerX()+game.getObjectsManager().getPlayerWidth()/2;
+        //this.posY=game.getObjectsManager().getPlayerY()-height;
+        System.out.println("height: "+height);
         this.velX=0;
         this.velY=-5;//-5;
         move=false;
