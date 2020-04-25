@@ -31,9 +31,9 @@ public class GameEngine implements Runnable {
         game=new Game(this);
     }
 
-    private void update(float dt) {
+    private void update() {
         if(state==STATE.GAME) {
-            game.update(dt);
+            game.update();
         }
         else
         {
@@ -75,7 +75,7 @@ public class GameEngine implements Runnable {
             {
                 unprocessedTime -= UPDATE_CAP;
                 Render = true;
-                update((float) UPDATE_CAP);
+                update();
                 if (frameTime >= 1.0) {
                     frameTime = 0;
                     fps = frames;

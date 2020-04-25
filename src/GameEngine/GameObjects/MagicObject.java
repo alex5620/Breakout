@@ -5,7 +5,6 @@ import GameEngine.Image;
 import GameEngine.Renderer;
 
 public class MagicObject extends GameObject {
-    Game game;
     private Image objectImage;
     enum Type{reverse, smaller, bigger, slower, faster, life, bonus100, bonus250, bonus500};
     private Type type;
@@ -16,26 +15,25 @@ public class MagicObject extends GameObject {
         this.posX = posX;
         this.posY = posY;
         this.type=type;
-        setDetails();
+        setObjectType();
         this.width=objectImage.getWidth();
         this.height=objectImage.getHeight();
+    }
+    @Override
+    public void update() {
+        if(game.getState()== Game.STATE.pause)//obiectele nu mai sunt updatate in pauza
+            return;
+        posY+=2;
+    }
+    @Override
+    public void render(Renderer r) {
+        r.drawImage(objectImage,(int) posX,(int) posY);
     }
     @Override
     public void setDead(boolean dead) {
         super.setDead(dead);
     }
-
-    @Override
-    public void update(Game gc, float dt) {
-        if(game.getState()== Game.STATE.pause)
-            return;
-        posY+=2;
-    }
-    @Override
-    public void render(Game gc, Renderer r) {
-            r.drawImage(objectImage,(int) posX,(int) posY);
-    }
-    public void setDetails() {
+    public void setObjectType() {//se alege imaginea corespunzatoare in functie de tipul obiectului
         switch (type) {
             case reverse: objectImage = game.getImagesLoader().getReverseImage();
                 break;
@@ -56,24 +54,24 @@ public class MagicObject extends GameObject {
             case bonus500: objectImage=game.getImagesLoader().getBonus_500_Image();
         }
     }
-    public void execute()
+    public void executeCommand()//se executa comanda corespunzatoare in functie de tipul obiectului
     {
         switch (type) {
             case reverse:
-                game.getObjectsManager().setReversedMovement();
+                game.getObjectsManager().setPlayerReversedMovement();
                 break;
             case bigger:
-                game.getObjectsManager().playerSize(1);
+                game.getObjectsManager().changePlayerSize(1);
                 break;
             case smaller:
-                game.getObjectsManager().playerSize(-1);
+                game.getObjectsManager().changePlayerSize(-1);
                 break;
             case slower:
                 game.getObjectsManager().changePlayerSpeed(-1);
                 break;
             case faster:
                 game.getObjectsManager().changePlayerSpeed(1);
-                game.getObjectsManager().changeBallSpeed();
+                game.getObjectsManager().incrementBallSpeed();
                 break;
             case life:
                 game.getObjectsManager().changePlayerLives(1);
@@ -88,8 +86,5 @@ public class MagicObject extends GameObject {
                 game.increaseScore(500);
                 break;
         }
-    }
-    public Type getType() {
-        return type;
     }
 }

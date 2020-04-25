@@ -37,9 +37,9 @@ public class Game {
         collider = new Collider(this);
         score=0;
     }
-    public void update(float dt) {
+    public void update() {
         if (gstate != STATE.pause) {
-            objectsManager.update(dt);
+            objectsManager.update();
             checkIfLevelPassed();
             checkIfLost();
             input.update();
@@ -74,14 +74,14 @@ public class Game {
         }
         else
         {
-            objectsManager.update(dt);
+            objectsManager.update();
             input.update();
             if(gameEngine.getMenu().getInput().getX()>619 && gameEngine.getMenu().getInput().getY()>580)
                 if(gameEngine.getMenu().pressCondition())
                 {
                     gameEngine.getMenu().updateHighscores(score);
                     objectsManager.destroyAllObjects();
-                    objectsManager.update(0);
+                    objectsManager.update();
                     gstate=STATE.playing;
                     gameEngine.setState(GameEngine.STATE.MENU);
                     gameEngine.getMenu().setPressed(true);
@@ -165,7 +165,7 @@ public class Game {
     public void LoadNewLevel()
     {
         objectsManager.setPlayerBallToInitial();
-        objectsManager.setPlayerNormalMovements();
+        objectsManager.setPlayerNormalMovement();
         generateMap();
     }
     public void printLoseMessage(Renderer renderer)
@@ -219,7 +219,7 @@ public class Game {
         objectsManager.changePlayerLives(life);
     }
     public void generateMap() { MapGenerator.generateMap(this,level);}
-    public void reinitializeGame() {
+    public void destroyAlmostAllBricks() {
         objectsManager.destroyAlmostAllBricks();
     }
     public boolean getLevelPassed() { return levelPassed; }
@@ -256,5 +256,9 @@ public class Game {
     public STATE getState()
     {
         return gstate;
+    }
+    public int getLevel()
+    {
+        return level;
     }
 }

@@ -50,7 +50,7 @@ public class ImagesLoader {
         brickImage[7]=new Image("/Resources/rbrick2.png");
         brickImage[8]=new Image("/Resources/vbrick2.png");
         brickImage[9]=new Image("/Resources/ybrick2.png");
-        ballImage=new Image("/Resources/ball2.png");
+        ballImage=new Image("/Resources/ball.png");
         playerImage=new Image[5];
         for(int i=0;i<5;++i)
         {

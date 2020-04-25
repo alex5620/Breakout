@@ -30,8 +30,6 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
-    public int getX() { return x; }
-    public int getY() { return y; }
     @Override
     public void mouseDragged(MouseEvent e) {}
     @Override
@@ -39,4 +37,6 @@ public class MouseInput implements MouseListener, MouseMotionListener {
         x=e.getX();
         y=e.getY();
     }
+    public int getX() { return x; }
+    public int getY() { return y; }
 }

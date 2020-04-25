@@ -3,14 +3,12 @@ package GameEngine.GameObjects;
 import GameEngine.Game;
 import GameEngine.Image;
 import GameEngine.Renderer;
-
 import java.awt.event.KeyEvent;
 
 public class Ball extends GameObject {
-    Game game;
     private Image objectImage;
-    private int velX = 0;
-    private int velY = -5;
+    private int velX;
+    private int velY;
     private boolean move=false;
     public Ball(Game game) {
         this.game = game;
@@ -20,114 +18,104 @@ public class Ball extends GameObject {
         this.height=objectImage.getHeight();
         setToInitialPosition();
     }
-
     @Override
-    public void update(Game game, float dt) {
-        if(game.getState()== Game.STATE.pause)
+    public void update() {
+        if(game.getState()== Game.STATE.pause)//cand e pauza, obiectele nu mai sunt updatate
         {
             return;
         }
         if(game.getInput().isKey(KeyEvent.VK_SPACE))
         {
-            if(game.getLevelPassed()==false) {//bug aparut, nu functioneaza fara
-                move = true;
-            }
-        }
-        /*if(game.getInput().isKey(KeyEvent.VK_A))
-        {
-            posX-=velX;
-        }
-        if(game.getInput().isKey(KeyEvent.VK_D))
-        {
-            posX+=velX;
-        }
-        if(game.getInput().isKey(KeyEvent.VK_W))
-        {
-            posY-=velY;
-        }
-        if(game.getInput().isKey(KeyEvent.VK_S))
-        {
-            posY+=velY;
-        }*/
-        if(move)
-        {
-                checkForBoundaries();
+            if(game.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
+                move = true;               //si suntem in acel moment in care trebuie sa apasam enter pentru
+            }                              //a trece la level-ul urmator, daca noi apasam space in loc de enter
+        }                                  //atunci mingea ar incepe sa se miste, desi nu am confirmat
+        if(move)                           //ca dorim sa incepem urmatorul level(nu am apasat enter)
+                                           //mai exact, intre levele mingea ramane blocata,
+        {                                  //aceasta avand void sa se miste doar dupa ce apasam tasta enter
+            updatePosition();
+            checkForBoundaries();
         }
         else
         {
-            GameObject obj;   //ne permite la inceputul jocului sa miscam mingea concomitent cu playerul
-            for(int i = 0; i< game.getObjectsManager().getObjects().size(); ++i)
-            {
-                obj= game.getObjectsManager().getObjects().get(i);
-                if(obj.getTag()=="player") {
-                    posX=((Player)obj).getPosX()+obj.getWidth()/2-width/2;
-                }
-            }
+            int playerX=game.getObjectsManager().getPlayerX();
+            int playerWidth=game.getObjectsManager().getPlayerWidth();
+            posX=playerX+playerWidth/2-width/2;//intre levele, dar si la inceperea unui nou level
+        }                          //inainte de a apasa tasta space pentru a da voie mingii sa se miste normal
+                                   //aceasta se misca pe axa OX odata concomitent cu player-ul
+    }
+    @Override
+    public void render(Renderer r) {
+        r.drawImage(objectImage, posX, posY);
+    }
+    private void updatePosition()
+    {
+        posX += velX;
+        posY += velY;
+    }
+    private void checkForBoundaries() {
+        if (posX < 0) {//verificare margine stanga
+            reverseVelX();
+        }
+        if (posY < 30) {//verificare margine sus
+            reverseVelY();
+        }
+        if (posX > (limit - width)) {//verificare margine dreapta
+            reverseVelX();
+        }
+        if  (posY>limit)//verificare margine jos
+        {
+            game.changePlayerLifes(-1);
+            game.getObjectsManager().setPlayerNormalMovement();
+            setToInitialPosition();
         }
     }
-
+    public void setToInitialPosition()//mingea este pozitionata deasupra player-ului
+    {
+        this.posX=game.getObjectsManager().getPlayerX()+game.getObjectsManager().getPlayerWidth()/2;
+        this.posY=game.getObjectsManager().getPlayerY()-height;
+        setInitialVelocities();//se stabile vitezele pe axele OX, OY
+    }
+    private void setInitialVelocities()
+    {
+        this.velX=0;
+        this.velY=-5-(game.getLevel()+1)/2;
+        move=false;
+    }
     public void reverseVelX() {
-        velX = -velX;
+        velX=-velX;
         posX+=velX;
     }
-
     public void reverseVelY()
     {
         velY=-velY;
         posY+=velY;
     }
-
-    private void checkForBoundaries() {
-        posX += velX;
-        posY += velY;
-        if (posX < 0) {
-            game.getCollider().resetHits();
-            reverseVelX();
-        }
-        if (posY < 0) {
-            game.getCollider().resetHits();
-            reverseVelY();
-        }
-        if (posX > (limit - 30)) {
-            game.getCollider().resetHits();
-            reverseVelX();
-        }
-        if  (posY>limit)
-        {
-            game.changePlayerLifes(-1);
-            setToInitialPosition();
-            //game.setLost(true);
-            //dead=true;
-        }
-
-    }
-    public void incrementVelX()
+    public void incrementVelY()//incrementam viteza mingii pe axa OY
     {
-        if(velX<=4)
+        velY+=Math.abs(velY)/velY;
+    }
+    public void increaseVelX(int val)
+    {
+        while(velX<=4 && val!=0) { //pe axa OX mingea poate avea viteza in intervalul [-5,5]
             ++velX;
+            --val;
+        }
     }
-    public void decrementVelX()
+    public void decreaseVelX(int val)
     {
-        if(velX>=-4)
+        while(velX>=-4 && val!=0)
+        {
             --velX;
+            ++val;
+        }
     }
-    @Override
-    public void render(Game gc, Renderer r) {
-        r.drawImage(objectImage, posX, posY);
-    }
-    public void setToInitialPosition()
+    public int getVelX()
     {
-        this.posX = 340;
-        this.posY = 519;
-        //this.posX=game.getObjectsManager().getPlayerX()+game.getObjectsManager().getPlayerWidth()/2;
-        //this.posY=game.getObjectsManager().getPlayerY()-height;
-        System.out.println("height: "+height);
-        this.velX=0;
-        this.velY=-5;//-5;
-        move=false;
+        return velX;
     }
-    public void changeVelY()
+    public int getVelY()
     {
-        velY+=velY/Math.abs(velY);
+        return velY;
     }
 }

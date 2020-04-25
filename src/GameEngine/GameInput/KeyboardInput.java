@@ -2,17 +2,14 @@ package GameEngine.GameInput;
 
 import GameEngine.GameEngine;
 import java.awt.event.*;
-import GameEngine.Game;
 
 public class KeyboardInput implements KeyListener {
-    private GameEngine gameEngine;
     private final int NUM_KEYS=256;
     private boolean [] keys=new boolean[NUM_KEYS];
     private boolean [] keysLast=new boolean[NUM_KEYS];//starea key-urilor la ultimul frame
 
     public KeyboardInput(GameEngine engine)
     {
-        this.gameEngine=engine;
         engine.getWindow().getCanvas().addKeyListener(this);
     }
 
@@ -23,7 +20,6 @@ public class KeyboardInput implements KeyListener {
             keysLast[i]=keys[i];
         }
     }
-
     public boolean isKey(int keyCode)
     {
         return keys[keyCode];
@@ -43,5 +39,4 @@ public class KeyboardInput implements KeyListener {
     public void keyReleased(KeyEvent e) {
         keys[e.getKeyCode()]=false;
     }
-
 }

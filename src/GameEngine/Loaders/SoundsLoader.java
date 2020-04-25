@@ -1,5 +1,4 @@
 package GameEngine.Loaders;
-
 import GameEngine.Sound;
 
 public class SoundsLoader {

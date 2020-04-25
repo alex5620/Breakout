@@ -1,66 +1,37 @@
 package GameEngine;
 
 import GameEngine.GameObjects.*;
-
 import java.awt.Rectangle;
 
 public class Collider {
-    Game game;
-    private GameObject player;
-    private GameObject ball;
+    private Game game;
+    private boolean []hits;
     private boolean playerBallDetectionX = false;
     private boolean playerBallDetectionY = false;
-    private boolean []hits;
-
     public Collider(Game game) {
         this.game = game;
-        player = findPlayer();
-        ball = findBall();
         hits=new boolean[4];
     }
-
     public void update() {
-        if (ball != null)
-            BallPaddleCollider();
+        BallPaddleCollider2();
         BallBrickCollider();
         MagicPlayerCollider();
     }
-
-    public GameObject findPlayer()//playerul nu va fi niciodata distrus, deci nu se ve returna null
-    {
-        GameObject player = null;
-        for (GameObject obj : game.getObjectsManager().getObjects()) {
-            if (obj instanceof Player) {
-                player = obj;
-                break;
-            }
-        }
-        return player;
-    }
-
-    public GameObject findBall() {
-        GameObject ball = null;//mingea va fi distrusa, dar atunci nu va mai fi randata sau detectata de collider
-        for (GameObject obj : game.getObjectsManager().getObjects()) {
-            if (obj instanceof Ball) {
-                ball = obj;
-                break;
-            }
-        }
-        return ball;
-    }
-
-    public void BallPaddleCollider() {
+    public void BallPaddleCollider2() {
+        GameObject player=game.getObjectsManager().getPlayer();
+        GameObject ball=game.getObjectsManager().getBall();
         Rectangle ballRectangle = new Rectangle(ball.getPosX(), ball.getPosY(), ball.getWidth(), ball.getHeight());
-        Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY() + 7, player.getWidth(), 1);
+        Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY()+1, player.getWidth(), 1);
         if (ballRectangle.intersects(playerRectangle)) {
-            resetHits();
             if (!playerBallDetectionY && (ball.getPosX() + ball.getWidth() > playerRectangle.x -2) && (ball.getPosX() < (playerRectangle.x + playerRectangle.width) + 2)) {
                 ((Ball) ball).reverseVelY();
-                if (ball.getPosX() + ball.getWidth() < player.getPosX() + player.getWidth() / 2) {
-                    ((Ball) ball).decrementVelX();
-                } else {
-                    ((Ball) ball).incrementVelX();
-                }
+                int val=ball.getPosX()+ball.getWidth()/2;//determinam pozitia in care se afla jumatatea mingii
+                val=val-(player.getPosX()+player.getWidth()/2);//comparativ cu jumatatea player-ului
+                val=val/(player.getWidth()/7);//de completat comentariul
+                if(val<0)
+                    ((Ball) ball).decreaseVelX(val);
+                else
+                    ((Ball) ball).increaseVelX(val);
                 playerBallDetectionY = true;
             }
             if (!playerBallDetectionX && (ball.getPosX() + ball.getWidth() > player.getPosX() && (ball.getPosX() + ball.getWidth() < player.getPosX() + 1)) || ((ball.getPosX() < player.getPosX() + player.getWidth()) && (ball.getPosX() > player.getPosX() + player.getWidth() - 1))) {
@@ -72,8 +43,28 @@ public class Collider {
             playerBallDetectionY = false;
         }
     }
+    public void BallPaddleCollider() {
+        GameObject ball = game.getObjectsManager().getBall();
+        GameObject player = game.getObjectsManager().getPlayer();
+        if (RectCircleColliding(player.getPosX(), player.getWidth(), player.getPosY()+1, player.getHeight())) {
+            System.out.println("Hit");
+            if ((ball.getPosY() + (ball.getHeight() * 2) / 3 > player.getPosY())) {
+                ((Ball) ball).reverseVelX();
+            } else {
+                ((Ball) ball).reverseVelY();
+                    int val=ball.getPosX()+ball.getWidth()/2;//determinam pozitia in care se afla jumatatea mingii
+                    val=val-(player.getPosX()+player.getWidth()/2);//comparativ cu jumatatea player-ului
+                    val=val/(player.getWidth()/7);//de completat comentariul
+                    if(val<0)
+                        ((Ball) ball).decreaseVelX(val);
+                    else
+                        ((Ball) ball).increaseVelX(val);
+            }
+        }
+    }
 
     public boolean RectCircleColliding(int xBrick, int wBrick, int yBrick, int hBrick) {
+        GameObject ball=game.getObjectsManager().getBall();
         int distX = Math.abs(ball.getPosX() + ball.getWidth() / 2 - (xBrick + wBrick / 2));
         int distY = Math.abs(ball.getPosY() + ball.getWidth() / 2 - (yBrick + hBrick / 2));
 
@@ -90,109 +81,160 @@ public class Collider {
         if (distY <= (hBrick / 2)) {
             return true;
         }
-
         int dx = distX - wBrick / 2;
         int dy = distY - hBrick / 2;
         return ((dx * dx + dy * dy) <= ((ball.getWidth() / 2) * (ball.getWidth() / 2)));
     }
 
     public void BallBrickCollider() {
+        Ball ball=(Ball)game.getObjectsManager().getBall();
         for (int i = 0; i < game.getObjectsManager().getObjects().size(); ++i) {
             GameObject obj = game.getObjectsManager().getObjects().get(i);
-            if (obj.getTag().equals("brick")) {
-                if (RectCircleColliding(obj.getPosX(), obj.getWidth(), obj.getPosY(), obj.getHeight())) {
-                    if ((ball.getPosX() + ball.getWidth() -3 <= obj.getPosX()) || (ball.getPosX() +3 >= obj.getPosX() + obj.getWidth())) {
-                        boolean left = ball.getPosX() < obj.getPosX();
-                        boolean right = ball.getPosX() + ball.getWidth() > obj.getPosX() + obj.getWidth();
-                        boolean reversed=false;
-                        if(hits[0]!=left){
-                                System.out.println("XXXXXX");
-                            ((Brick) obj).decrementHitsRemained();
-                                ((Ball) ball).reverseVelX();
-                                if(left) {
-                                    hits[0] = true;
-                                    hits[1]=false;
-                                }
-                                if(right) {
-                                    hits[1] = true;
-                                    hits[0]=false;
-                                }
-                                //reversed=true;
-                        }
-                        if(hits[1]!=right && reversed==false){
-                            System.out.println("XXXXXX");
-                            ((Brick) obj).decrementHitsRemained();
-                            ((Ball) ball).reverseVelX();
-                            if(left) {
-                                hits[0] = true;
-                                hits[1]=false;
-                            }
-                            if(right) {
-                                hits[1] = true;
-                                hits[0]=false;
-                            }
-                        }
-                        hits[2]=false;
-                        hits[3]=false;
-                    }else {
-                        boolean up=ball.getPosY()<obj.getPosY();
-                        boolean down=ball.getPosY()+ball.getHeight()>obj.getPosY()+obj.getHeight();
-                        boolean reversed=false;
-                        if(hits[2]!=up){
-                            System.out.println("YYYYYYY");
-                            ((Brick) obj).decrementHitsRemained();
-                            ((Ball) ball).reverseVelY();
-                            if(up) {
-                                hits[2] = true;
-                                hits[3]=false;
-                            }
-                            if(down) {
-                                hits[3] = true;
-                                hits[2]=false;
-                            }
-                            reversed=true;
-                        }
-                        if(hits[3]!=down && reversed==false){
-                            System.out.println("YYYYYYY");
-                            ((Ball) ball).reverseVelY();
-                            ((Brick) obj).decrementHitsRemained();
-                            if(up) {
-                                hits[2] = true;
-                                hits[3]=false;
-                            }
-                            if(down) {
-                                hits[3] = true;
-                                hits[2]=false;
-                            }
-                        }
-                        hits[1]=false;
-                        hits[0]=false;
+            if (obj.getTag().equals("brick")) {//it ball //br brick
+                float brickx = obj.getPosX();
+                float bricky = obj.getPosY();
+
+                // Center of the ball x and y coordinates
+                float ballcenterx = ball.getPosX()+ball.getWidth()/2;
+                float ballcentery = ball.getPosY()+ball.getHeight()/2;
+
+                // Center of the brick x and y coordinates
+                float brickcenterx = obj.getPosX()+obj.getWidth()/2;
+                float brickcentery = obj.getPosY()+obj.getHeight()/2;
+
+                if (ball.getPosX() <= obj.getPosX() + obj.getWidth() &&
+                        ball.getPosX()+ball.getWidth() >= brickx &&
+                                ball.getPosY() <= bricky + obj.getHeight() &&
+                                        ball.getPosY() + ball.getHeight() >= bricky) {
+                    // Collision detected, remove the brick
+                    ((Brick)obj).decrementHitsRemained();
+
+                    // Asume the ball goes slow enough to not skip through the bricks
+
+                    // Calculate ysize
+                    float ymin = 0;
+                    if (bricky > ball.getPosY()) {
+                        ymin = bricky;
+                    } else {
+                        ymin = ball.getPosY();
                     }
-                    //((Brick) obj).decrementHitsRemained();
-                    game.getSoundsLoader().playBrickHitSound();
-                    break;
+
+                    float ymax = 0;
+                    if (bricky + obj.getHeight() < ball.getPosY() + ball.getHeight()) {
+                        ymax = bricky + obj.getHeight();
+                    } else {
+                        ymax = ball.getPosY() + ball.getHeight();
+                    }
+
+                    float ysize = ymax - ymin;
+
+                    // Calculate xsize
+                    float xmin = 0;
+                    if (brickx > ball.getPosX()) {
+                        xmin = brickx;
+                    } else {
+                        xmin = ball.getPosX();
+                    }
+
+                    float xmax = 0;
+                    if (brickx + obj.getWidth() < ball.getPosX() + ball.getWidth()) {
+                        xmax = brickx + obj.getWidth();
+                    } else {
+                        xmax = ball.getPosX() + ball.getWidth();
+                    }
+
+                    float xsize = xmax - xmin;
+                    int response;
+                    // The origin is at the top-left corner of the screen!
+                    // Set collision response
+                    if (xsize > ysize) {
+                        if (ballcentery > brickcentery) {
+                            BallBrickResponse(3);
+                        } else {
+                            // Top
+                            BallBrickResponse(1);
+                        }
+                    } else {
+                        if (ballcenterx < brickcenterx) {
+                            // Left
+                            BallBrickResponse(0);
+                        } else {
+                            // Right
+                            BallBrickResponse(2);
+                        }
+                    }
                 }
             }
-            resetHits();
         }
     }
+    public void BallBrickResponse(int dirindex) {
+        // dirindex 0: Left, 1: Top, 2: Right, 3: Bottom
+        Ball ball=(Ball)game.getObjectsManager().getBall();
+        // Direction factors
+        int mulx = 1;
+        int muly = 1;
 
-    public void resetHits()
-    {
-        for (int i=0;i<hits.length;++i)
+        if (ball.getVelX() >= 0) {
+            // Ball is moving in the positive x direction
+            if (ball.getVelY() > 0) {
+                // Ball is moving in the positive y direction
+                // +1 +1
+                if (dirindex == 0 || dirindex == 3) {
+                    mulx = -1;
+                } else {
+                    muly = -1;
+                }
+            } else if (ball.getVelY() < 0) {
+                // Ball is moving in the negative y direction
+                // +1 -1
+                if (dirindex == 0 || dirindex == 1) {
+                    mulx = -1;
+                } else {
+                    muly = -1;
+                }
+            }
+        } else if (ball.getVelX() < 0) {
+            // Ball is moving in the negative x direction
+            if (ball.getVelY() > 0) {
+                // Ball is moving in the positive y direction
+                // -1 +1
+                if (dirindex == 2 || dirindex == 3) {
+                    mulx = -1;
+                } else {
+                    muly = -1;
+                }
+            } else if (ball.getVelY() < 0) {
+                // Ball is moving in the negative y direction
+                // -1 -1
+                if (dirindex == 1 || dirindex == 2) {
+                    mulx = -1;
+                } else {
+                    muly = -1;
+                }
+            }
+        }
+
+        // Set the new direction of the ball, by multiplying the old direction
+        // with the determined direction factors
+        if(mulx<0)
         {
-            hits[i]=false;
+            ball.reverseVelX();
         }
+        if(muly<0)
+        {
+            ball.reverseVelY();
+        }
+        //ball->SetDirection(mulx*ball->dirx, muly*ball->diry);
     }
-
     public void MagicPlayerCollider() {
+        GameObject player=game.getObjectsManager().getPlayer();
         for (int i = 0; i < game.getObjectsManager().getObjects().size(); ++i) {
             GameObject obj = game.getObjectsManager().getObjects().get(i);
             if (obj.getTag().equals("magic")) {
                 Rectangle magicRectangle = new Rectangle(obj.getPosX(), obj.getPosY(), obj.getWidth(), obj.getHeight());
-                Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY() + 7, player.getWidth(), 1);
+                Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY() , player.getWidth(), 1);
                 if (magicRectangle.intersects(playerRectangle)) {
-                    ((MagicObject)obj).execute();
+                    ((MagicObject)obj).executeCommand();
                     obj.setDead(true);
                 }
             }
