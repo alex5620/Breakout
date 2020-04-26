@@ -66,15 +66,15 @@ public class Renderer {
             unicode=text.codePointAt(i)-32;
             for(int y=0;y<fontImage.getHeight();++y)
             {
-                int val=(int)(Math.random()*1000);
+                //int val=(int)(Math.random()*1000);
                 for(int x=0;x<font.getWidths()[unicode];++x)
                 {
 
                     if(fontImage.getPixels()[(x+font.getOffsets()[unicode])+y*fontImage.getWidth()]==0xff000000)
                     {
-                        if(val>=10)
+                        //if(val>=10)
                             setPixel(x + offX+offset, y + offY, color);
-                        else
+                        //else
                             setPixel(x + offX+offset+1, y + offY+1, color);
                     }
                 }

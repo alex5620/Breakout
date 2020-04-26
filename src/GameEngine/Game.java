@@ -17,6 +17,7 @@ public class Game {
     private int score;
     private boolean lost, levelPassed;
     private int level;
+    private boolean instructionsPresented;
     public enum STATE{playing, lost, won, pause};
     private STATE gstate;
     public Game(GameEngine engine)
@@ -28,6 +29,7 @@ public class Game {
         objectsManager=new ObjectsManager(this);
         lost = false;
         levelPassed = false;
+        instructionsPresented=false;
     }
     public void init() {
         level=1;
@@ -103,6 +105,10 @@ public class Game {
         if (gstate == STATE.playing) {
             renderer.drawImage(gameEngine.getImagesLoader().getBackgroundImage(), 0, 0);
             objectsManager.render();
+            if(level==1 && ((Ball)objectsManager.getBall()).isMoving()==false && !instructionsPresented)
+            {
+                renderer.drawImage(gameEngine.getImagesLoader().getHowToPlayImage(), 150, 250);
+            }
             if (!lost) {
                 if (!levelPassed) {
                     printLevel_Score();
@@ -133,9 +139,9 @@ public class Game {
             int x=gameEngine.getMenu().getInput().getX();
             int y=gameEngine.getMenu().getInput().getY();
             renderer.drawImage(gameEngine.getImagesLoader().getWonImage(), 0, 0);
-            renderer.drawText("Your score: "+score , 250, 210, 0xffff0606);
+            renderer.drawText("Your score: "+score , 265, 210, 0xffff0606);
             if(score>gameEngine.getMenu().getMinimumScore())
-                renderer.drawText("Congrats, you are in top 10!" , 160, 280, 0xffff0606);
+                renderer.drawText("Congrats, you are in top 10!" , 190, 280, 0xffff0606);
             if((x>250) && (x<505) && (y>386) && (y<441))
             {
             renderer.drawImage(gameEngine.getImagesLoader().getBackToMenu2Image(), 248, 386);
@@ -176,12 +182,12 @@ public class Game {
     public void printLevelPassedMessage()
     {
         renderer.drawText("Level" + level, 320, 200, 0xff0000ff);
-        renderer.drawText("Press enter to continue ", 180, 250, 0xff0000ff);
+        renderer.drawText("Press enter to continue ", 210, 250, 0xff0000ff);
     }
     public void printLevel_Score()
     {
         renderer.drawText("Level" + level, 30, 6, 0xffff0000);
-        renderer.drawText("SCORE:" + score, 600, 7, 0xffff0000);
+        renderer.drawText("SCORE: " + score, 600, 7, 0xffff0000);
     }
     public KeyboardInput getInput() {
         return input;
@@ -261,4 +267,5 @@ public class Game {
     {
         return level;
     }
+    public void setInstructionsPresented() { instructionsPresented=true; }
 }

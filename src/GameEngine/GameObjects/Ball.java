@@ -27,6 +27,7 @@ public class Ball extends GameObject {
         if(game.getInput().isKey(KeyEvent.VK_SPACE))
         {
             if(game.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
+                game.setInstructionsPresented();
                 move = true;               //si suntem in acel moment in care trebuie sa apasam enter pentru
             }                              //a trece la level-ul urmator, daca noi apasam space in loc de enter
         }                                  //atunci mingea ar incepe sa se miste, desi nu am confirmat
@@ -117,5 +118,8 @@ public class Ball extends GameObject {
     public int getVelY()
     {
         return velY;
+    }
+    public boolean isMoving() {
+        return move;
     }
 }

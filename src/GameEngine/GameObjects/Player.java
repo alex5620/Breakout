@@ -69,7 +69,7 @@ public class Player extends GameObject {
     }
     public void setToInitialPosition()
     {
-        this.posX=320;
+        this.posX=300;
         this.posY=550;
     }
     public void setReversedMovement(boolean cond)

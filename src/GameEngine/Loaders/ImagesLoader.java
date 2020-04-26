@@ -36,6 +36,8 @@ public class ImagesLoader {
     private Image pauseImage;
     private Image exitImage;
     private Image exit2Image;
+    private Image howToPlay;
+    private Image aboutImage;
     private final int brickImagesNumber=10;
     public ImagesLoader()
     {
@@ -57,7 +59,7 @@ public class ImagesLoader {
             playerImage[i]=new Image("/Resources/paddle_size"+(i+1)+".png");
         }
         backgroundImage =new Image("/Resources/back2.png");
-        menuImage = new Image("/Resources/menu.png");
+        menuImage = new Image("/Resources/menu2.png");
         playImage = new Image("/Resources/play.png");
         highScoresImage=new Image("/Resources/highscores.png");
         settingsImage= new Image("/Resources/settings.png");
@@ -86,6 +88,8 @@ public class ImagesLoader {
         pauseImage=new Image("/Resources/pause.png");
         exitImage=new Image("/Resources/exit.png");
         exit2Image=new Image("/Resources/exit2.png");
+        howToPlay=new Image("/Resources/howToPlay.png");
+        aboutImage=new Image("/Resources/about.png");
     }
     public Image getBallImage() {
         return ballImage;
@@ -132,4 +136,6 @@ public class ImagesLoader {
     public Image getPauseImage() { return pauseImage; }
     public Image getExitImage() { return exitImage; }
     public Image getExit2Image() { return exit2Image; }
+    public Image getHowToPlayImage() { return howToPlay; }
+    public Image getAboutImage() { return aboutImage; }
 }
