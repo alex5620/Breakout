@@ -53,6 +53,7 @@ public class ObjectsManager {
     }                                       //nu apasa tasta enter de trecere la level-ul urmator
     public void generateMagicObjects(int x, int y)
     {
+        ObjectFactory factory=ObjectFactory.getInstance();
         if(game.getState()== Game.STATE.pause)
             return;
         int val=(int)(Math.random()*100);
@@ -60,31 +61,31 @@ public class ObjectsManager {
             int val2 = (int) (Math.random() * 9);
             switch (val2) {
                 case 0:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.bigger));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bigger));
                     break;
                 case 1:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.smaller));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.smaller));
                     break;
                 case 2:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.reverse));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.reverse));
                     break;
                 case 3:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.slower));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.slower));
                     break;
                 case 4:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.faster));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.faster));
                     break;
                 case 5:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.life));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.life));
                     break;
                 case 6:
                     addObject(new MagicObject(game, x, y, MagicObject.Type.bonus100));
                     break;
                 case 7:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus250));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bonus250));
                     break;
                 case 8:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus500));
+                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bonus500));
                     break;
             }
         }

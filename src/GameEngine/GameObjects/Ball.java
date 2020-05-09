@@ -24,7 +24,7 @@ public class Ball extends GameObject {
         {
             return;
         }
-        if(game.getInput().isKey(KeyEvent.VK_SPACE))
+        if(game.getKeyboardInput().isKey(KeyEvent.VK_SPACE))
         {
             if(game.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
                 game.setInstructionsPresented();
@@ -66,7 +66,7 @@ public class Ball extends GameObject {
         }
         if  (posY>limit)//verificare margine jos
         {
-            game.changePlayerLifes(-1);
+            game.changePlayerLives(-1);
             game.getObjectsManager().setPlayerNormalMovement();
             setToInitialPosition();
         }

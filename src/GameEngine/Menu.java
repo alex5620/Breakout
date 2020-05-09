@@ -8,10 +8,7 @@ import java.sql.SQLException;
 public class Menu {
     private GameEngine gameEngine;
     private HighScoresDataBase highscores;
-    private MouseInput input;
     private String name;
-    boolean pressed=false;
-    boolean pressedLast=true;
     public enum MSTATE{MAIN_MENU, SETTINGS_MENU, HIGHSCORE_MENU, ABOUT_MENU};
     private MSTATE mstate;
     Menu(GameEngine gameEngine)
@@ -19,8 +16,7 @@ public class Menu {
         this.gameEngine = gameEngine;
         mstate=MSTATE.MAIN_MENU;
         highscores=new HighScoresDataBase();
-        input=new MouseInput(gameEngine);
-        name="ALEX";
+        name="PLAYER";
     }
     public void render()
     {
@@ -46,8 +42,8 @@ public class Menu {
         }
         if(mstate ==MSTATE.SETTINGS_MENU)
         {
-            int x=input.getX();
-            int y=input.getY();
+            int x= gameEngine.getMouseInput().getX();
+            int y= gameEngine.getMouseInput().getY();
             renderer.drawImage(gameEngine.getImagesLoader().getSettingsMenuImage(), 0, 0);
             renderer.drawText("Set Name:", 195, 208, 0xffff0606);
             renderer.drawText(name, 190, 235, 0xffff0606);
@@ -105,9 +101,9 @@ public class Menu {
     }
     public void update()
     {
-        int x=input.getX();
-        int y=input.getY();
-        if(pressCondition()) {
+        if(gameEngine.getMouseInput().isClick1Up()) {
+            int x= gameEngine.getMouseInput().getX();
+            int y= gameEngine.getMouseInput().getY();
             if((mstate == MSTATE.SETTINGS_MENU) && (x > 200) && (x < 550) && (y > 280) && (y < 590)) {
                 char car = 'A';
                 int sx = x - 185;
@@ -159,12 +155,13 @@ public class Menu {
                     mstate = MSTATE.MAIN_MENU;
                 }
             }
-            setPressed(false);
         }
     }
     public boolean checkIfPlay()
     {
-        if((input.getX()>268) && (input.getX()<435) && (input.getY()>238) && (input.getY()<298))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>268) && (x<435) && (y>238) && (y<298))
         {
             return true;
         }
@@ -172,7 +169,9 @@ public class Menu {
     }
     public boolean checkIfHighScores()
     {
-        if((input.getX()>200) && (input.getX()<508) && (input.getY()>315) && (input.getY()<370))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>200) && (x<508) && (y>315) && (y<370))
         {
             return true;
         }
@@ -180,7 +179,9 @@ public class Menu {
     }
     public boolean checkIfSettings()
     {
-        if ((input.getX()>244) && (input.getX()<473) && (input.getY()>390) && (input.getY()<440))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if ((x>244) && (x<473) && (y>390) && (y<440))
         {
             return true;
         }
@@ -188,7 +189,9 @@ public class Menu {
     }
     public boolean checkIfAbout()
     {
-        if((input.getX()>268) && (input.getX()<435) && (input.getY()>465) && (input.getY()<525))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>268) && (x<435) && (y>465) && (y<525))
         {
             return true;
         }
@@ -196,7 +199,9 @@ public class Menu {
     }
     public boolean checkIfQuit()
     {
-        if((input.getX()>230) && (input.getX()<490) && (input.getY()>545) && (input.getY()<600))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>230) && (x<490) && (y>545) && (y<600))
         {
             return true;
         }
@@ -204,7 +209,9 @@ public class Menu {
     }
     public boolean checkIfBack()
     {
-        if((input.getX()>645) && (input.getX()<770) && (input.getY()>575) && (input.getY()<628))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>645) && (x<770) && (y>575) && (y<628))
         {
             return true;
         }
@@ -212,7 +219,9 @@ public class Menu {
     }
     public boolean checkIfReset()
     {
-        if((input.getX()>643) && (input.getX()<770) && (input.getY()>493) && (input.getY()<545))
+        int x= gameEngine.getMouseInput().getX();
+        int y= gameEngine.getMouseInput().getY();
+        if((x>643) && (x<770) && (y>493) && (y<545))
         {
             return true;
         }
@@ -222,23 +231,12 @@ public class Menu {
     {
         return name;
     }
-
-    public void setPressed(boolean pressed) {
-        this.pressedLast=this.pressed;
-        this.pressed = pressed;
-        System.out.println("Last: "+pressedLast+", this: "+this.pressed);
-    }
     public void updateHighscores(int score)
     {
         if(name.length()>0)
             highscores.updateTable(name, score);
         else
             highscores.updateTable("Noname", score);
-    }
-    public MouseInput getInput() { return input; }
-    public boolean pressCondition()
-    {
-        return pressed && !pressedLast;
     }
     public int getMinimumScore() { return highscores.minScore(); }
 }

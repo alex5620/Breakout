@@ -25,28 +25,28 @@ public class Player extends GameObject {
     }
     @Override
     public void update() {
-        if(game.getInput().isKeyUp(KeyEvent.VK_P))//pauza joc
+        if(game.getKeyboardInput().isKeyUp(KeyEvent.VK_P))//pauza joc
         {
             game.setPause();
         }
         if(game.getState()== Game.STATE.pause) {//daca e pauza, nu se mai face update
             return;
         }
-        if (game.getInput().isKey(KeyEvent.VK_LEFT)) {//update pozitie jucator
+        if (game.getKeyboardInput().isKey(KeyEvent.VK_LEFT)) {//update pozitie jucator
             if (!reversedMovement)
                 posX -= velX;
             else
                 posX += velX;
             checkForBoundaries();
         }
-        if (game.getInput().isKeyUp(KeyEvent.VK_U)) {   //se distrug toate caramizile, in afara de una
-            if(game.getLevelPassed()==false)
+        if (game.getKeyboardInput().isKey(KeyEvent.VK_U)) {   //se distrug toate caramizile, in afara de una
+            if(game.getLevelPassed()==false && game.isInstructionsPresented())
                 game.destroyAlmostAllBricks();              //aceasta functionalitate e lasata doar pentru verificarea
         }                                               //corectitudinii functionalitatii jocului
-        if (game.getInput().isKey(KeyEvent.VK_ENTER)) { //intre levele trebuie apasata tasta enter
+        if (game.getKeyboardInput().isKey(KeyEvent.VK_ENTER)) { //intre levele trebuie apasata tasta enter
             game.setLeveLPassed(false);                 //pentru a putea trece la levelul urmator
         }
-        if (game.getInput().isKey(KeyEvent.VK_RIGHT)) { //update pozitie jucator
+        if (game.getKeyboardInput().isKey(KeyEvent.VK_RIGHT)) { //update pozitie jucator
             if (!reversedMovement)
                 posX += velX;
             else

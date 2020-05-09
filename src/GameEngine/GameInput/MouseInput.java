@@ -6,24 +6,36 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener, MouseMotionListener {
-    private GameEngine gameEngine;
+    private final int NUM_BUTTONS=5;
+    private boolean [] buttons=new boolean[NUM_BUTTONS];
+    private boolean [] buttonsLast=new boolean[NUM_BUTTONS];
     private int x;
     private int y;
     public MouseInput(GameEngine gameEngine)
     {
-        this.gameEngine = gameEngine;
         gameEngine.getWindow().getCanvas().addMouseListener(this);
         gameEngine.getWindow().getCanvas().addMouseMotionListener(this);
+    }
+    public void update()
+    {
+        for(int i=0;i<NUM_BUTTONS;++i)
+        {
+            buttonsLast[i]=buttons[i];
+        }
+    }
+    public boolean isClick1Up()
+    {
+        return !buttons[1] && buttonsLast[1];
     }
     @Override
     public void mouseClicked(MouseEvent e) {}
     @Override
     public void mousePressed(MouseEvent e) {
-        gameEngine.getMenu().setPressed(true);
-        }
+        buttons[e.getButton()]=true;
+    }
     @Override
     public void mouseReleased(MouseEvent e) {
-        gameEngine.getMenu().setPressed(false);
+        buttons[e.getButton()]=false;
     }
     @Override
     public void mouseEntered(MouseEvent e) {}

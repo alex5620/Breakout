@@ -1,5 +1,7 @@
 package GameEngine;
 
+import GameEngine.GameInput.KeyboardInput;
+import GameEngine.GameInput.MouseInput;
 import GameEngine.Loaders.ImagesLoader;
 import GameEngine.Loaders.SoundsLoader;
 import static java.lang.Thread.sleep;
@@ -10,6 +12,8 @@ public class GameEngine implements Runnable {
     private Renderer renderer;
     private Menu menu;
     private Game game;
+    private KeyboardInput keyboardInput;
+    private MouseInput mouseInput;
     private ImagesLoader ImagesLoader;
     private SoundsLoader SoundsLoader;
     private boolean running;
@@ -27,6 +31,8 @@ public class GameEngine implements Runnable {
         renderer = new Renderer(this);
         ImagesLoader= new ImagesLoader();
         SoundsLoader=new SoundsLoader();
+        keyboardInput = new KeyboardInput(this);
+        mouseInput=new MouseInput(this);
         menu=new Menu(this);
         game=new Game(this);
     }
@@ -39,6 +45,8 @@ public class GameEngine implements Runnable {
         {
             menu.update();
         }
+        keyboardInput.update();
+        mouseInput.update();
     }
     private void render() {
         renderer.clear();
@@ -127,4 +135,6 @@ public class GameEngine implements Runnable {
     public void setState(STATE state) { this.state=state; }
     public Menu getMenu() { return menu; }
     public Game getGame() { return game; }
+    public KeyboardInput getKeyboardInput() { return keyboardInput; }
+    public MouseInput getMouseInput() { return mouseInput; }
 }
