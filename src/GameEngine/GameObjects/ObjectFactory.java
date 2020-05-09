@@ -1,6 +1,6 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Game;
+import GameEngine.States.PlayState.PlayingState;
 
 public class ObjectFactory {
     private static volatile ObjectFactory factory;
@@ -12,27 +12,26 @@ public class ObjectFactory {
                     factory = new ObjectFactory();
                 }
             }
-
         }
         return factory;
     }
     public static synchronized void Reset() {
         factory = null;
     }
-    public GameObject getPlayer(Game game)
+    public GameObject getObject(PlayingState playingState, String type)
     {
-        return new Player(game);
-    }
-    public GameObject getBall(Game game)
-    {
-        return new Ball(game);
-    }
-    public GameObject getBrick(Game game,int posX, int posY, int imageIndex, int hitsRemained)
-    {
-        return new Brick(game, posX, posY, imageIndex, hitsRemained);
-    }
-    public GameObject getMagicObject(Game game, int posX, int posY, MagicObject.Type type)
-    {
-        return new MagicObject(game, posX, posY, type);
+        switch (type)
+        {
+            case "player":
+                return new Player(playingState);
+            case "ball":
+                return new Ball(playingState);
+            case "brick":
+                return new Brick(playingState);
+            case "magic":
+                return new MagicObject(playingState);
+            default:
+                return null;
+        }
     }
 }

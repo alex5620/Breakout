@@ -4,27 +4,32 @@ import GameEngine.GameInput.KeyboardInput;
 import GameEngine.GameInput.MouseInput;
 import GameEngine.Loaders.ImagesLoader;
 import GameEngine.Loaders.SoundsLoader;
+import GameEngine.States.*;
+import GameEngine.States.PlayState.PlayState;
+import GameEngine.States.PlayState.PlayingState;
+
 import static java.lang.Thread.sleep;
 
 public class GameEngine implements Runnable {
     private Thread thread;
     private Window window;
     private Renderer renderer;
-    private Menu menu;
-    private Game game;
     private KeyboardInput keyboardInput;
+    private HighScoresDataBase highscores;
     private MouseInput mouseInput;
     private ImagesLoader ImagesLoader;
     private SoundsLoader SoundsLoader;
+    private State currentState;
+    private SaveSettings settings;
     private boolean running;
     private final double UPDATE_CAP = 1.0 / 60.0;
     private final int width = 768, height = 640;
     private int scale = 1;
     private final String title = "Breakout";
-    public enum STATE{MENU, GAME};
-    private STATE state;
+    public enum STATE{MainMenuState, PlayState, HighscoreMenuState, SettingsState, AboutState};
     public GameEngine() {
-        state=STATE.MENU;
+        currentState=new MainMenuState(this);
+        highscores=new HighScoresDataBase();
         running = false;
         thread = new Thread(this);
         window = new Window(this);
@@ -33,30 +38,19 @@ public class GameEngine implements Runnable {
         SoundsLoader=new SoundsLoader();
         keyboardInput = new KeyboardInput(this);
         mouseInput=new MouseInput(this);
-        menu=new Menu(this);
-        game=new Game(this);
+        settings=new SaveSettings();
+        settings.setInstructionsPresented(false);
     }
 
     private void update() {
-        if(state==STATE.GAME) {
-            game.update();
-        }
-        else
-        {
-            menu.update();
-        }
+        currentState.update();
         keyboardInput.update();
         mouseInput.update();
     }
     private void render() {
         renderer.clear();
         renderer.process();
-        if (state == STATE.GAME) {
-            game.render();
-        }
-        else {
-            menu.render();
-        }
+        currentState.render(renderer);
         window.update();
     }
     public void run() {
@@ -103,6 +97,26 @@ public class GameEngine implements Runnable {
             }
         }
     }
+    public void setState(STATE state) {
+        switch (state)
+        {
+            case MainMenuState:
+                currentState=new MainMenuState(this);
+                break;
+            case PlayState:
+                currentState=new PlayState(this);
+                break;
+            case HighscoreMenuState:
+                currentState=new HighscoreMenuState(this);
+                break;
+            case SettingsState:
+                currentState=new SettingsMenuState(this);
+                break;
+            case AboutState:
+                currentState=new AboutMenuState(this);
+                break;
+        }
+    }
     public synchronized void start() {
         thread.run();
     }
@@ -132,9 +146,22 @@ public class GameEngine implements Runnable {
     }
     public ImagesLoader getImagesLoader() { return ImagesLoader; }
     public SoundsLoader getSoundsLoader(){ return SoundsLoader; }
-    public void setState(STATE state) { this.state=state; }
-    public Menu getMenu() { return menu; }
-    public Game getGame() { return game; }
     public KeyboardInput getKeyboardInput() { return keyboardInput; }
     public MouseInput getMouseInput() { return mouseInput; }
+    public void updateHighscores(int score)
+    {
+        String name=settings.getName();
+        if(name.length()>0)
+            highscores.updateTable(name, score);
+        else
+            highscores.updateTable("Player", score);
+    }
+    public HighScoresDataBase getHighscore()
+    {
+        return highscores;
+    }
+
+    public SaveSettings getSettings() {
+        return settings;
+    }
 }

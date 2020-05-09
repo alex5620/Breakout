@@ -1,16 +1,18 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Game;
+import GameEngine.Renderer;
+import GameEngine.States.PlayState.PlayingState;
+
 import java.util.ArrayList;
 
 public class ObjectsManager {
-    Game game;
+    private PlayingState playingState;
     private ArrayList<GameObject> objects;
     private Player player;//player-ul si mingea sunt obiecte mai utilizate, de aceea avem o referinta catre ele
     private Ball ball;    //mai utilizate, in sensul ca functiile acestora sunt apelate mai des
-    public ObjectsManager(Game game)//de aceea, pentru a nu fi nevoiti sa facem mereu un loop care sa caute
+    public ObjectsManager(PlayingState playing)//de aceea, pentru a nu fi nevoiti sa facem mereu un loop care sa caute
     {                               //player-ul si mingea, am preferat sa pastrez aceste referinte
-        this.game = game;
+        this.playingState = playing;
         objects = new ArrayList<>();
     }
     public void addObject(GameObject object)
@@ -30,8 +32,8 @@ public class ObjectsManager {
         for (int i = 0; i < objects.size(); ++i) {
             objects.get(i).update();
             if (objects.get(i).isDead()) {
-                if((!game.getLost()) && (objects.get(i) instanceof Brick)) {
-                    game.incremetScore();
+                if((objects.get(i) instanceof Brick)) {
+                    playingState.incremetScore();
                     generateMagicObjects(objects.get(i).getPosX()+objects.get(i).getWidth()/2, objects.get(i).getPosY()+objects.get(i).getHeight());
                 }                   //daca obiectul distrus este o caramida, atunci se incrementeaza scorul
                 objects.remove(i);  //incrementarea se facem doar daca jocul nu este pierdut
@@ -39,67 +41,61 @@ public class ObjectsManager {
             }                       //astfel, trebuie sa se tina seama ca scorul sa fie incrementat corespunzator
         }
     }
-    public void render()
+    public void render(Renderer renderer)
     {
         int size=objects.size();
         for (int i = 0; i < size; ++i) {
-            if (!game.getLevelPassed())
-                objects.get(i).render(game.getRenderer());
+            if (!playingState.getLevelPassed())
+                objects.get(i).render(renderer);
             else {
                 if (objects.get(i) instanceof Ball || objects.get(i) instanceof Player)
-                    objects.get(i).render(game.getRenderer());
+                    objects.get(i).render(renderer);
             }                               //de indata ce player-ul a trecut un level, noua mapa este generata,
         }                                   //dar caramizile nu sunt randate pana cand player-ul
     }                                       //nu apasa tasta enter de trecere la level-ul urmator
     public void generateMagicObjects(int x, int y)
     {
         ObjectFactory factory=ObjectFactory.getInstance();
-        if(game.getState()== Game.STATE.pause)
+        if(playingState.IsPaused()== true)
             return;
         int val=(int)(Math.random()*100);
         if(val<12) {
             int val2 = (int) (Math.random() * 9);
             switch (val2) {
                 case 0:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bigger));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bigger));
                     break;
                 case 1:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.smaller));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.smaller));
                     break;
                 case 2:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.reverse));
+                    addObject(((MagicObject)(factory.getObject(playingState,"magic"))).setDetails(x, y, MagicObject.Type.reverse));
                     break;
                 case 3:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.slower));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.slower));
                     break;
                 case 4:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.faster));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.faster));
                     break;
                 case 5:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.life));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.life));
                     break;
                 case 6:
-                    addObject(new MagicObject(game, x, y, MagicObject.Type.bonus100));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus100));
                     break;
                 case 7:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bonus250));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus250));
                     break;
                 case 8:
-                    addObject(factory.getMagicObject(game, x, y, MagicObject.Type.bonus500));
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus500));
                     break;
             }
-        }
-    }
-    public void destroyAllObjects()
-    {
-        for (GameObject obj : objects) {
-            obj.setDead(true);
         }
     }
     public void destroyAlmostAllBricks()
     {
         for (GameObject obj : objects) {
-            if (obj.getTag().equals("brick") && Brick.getBricksNumber()!=1) {
+            if (obj.getTag().equals("brick") && Brick.getBricksNumber()>1) {
                 obj.setDead(true);
             }
         }

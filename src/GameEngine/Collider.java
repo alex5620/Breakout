@@ -1,16 +1,16 @@
 package GameEngine;
 
 import GameEngine.GameObjects.*;
+import GameEngine.States.PlayState.PlayingState;
+
 import java.awt.Rectangle;
 
 public class Collider {
-    private Game game;
-    private boolean []hits;
+    private PlayingState playingState;
     private boolean playerBallDetectionX = false;
     private boolean playerBallDetectionY = false;
-    public Collider(Game game) {
-        this.game = game;
-        hits=new boolean[4];
+    public Collider(PlayingState playingState) {
+        this.playingState = playingState;
     }
     public void update() {
         BallPaddleCollider2();
@@ -18,8 +18,8 @@ public class Collider {
         MagicPlayerCollider();
     }
     public void BallPaddleCollider2() {
-        GameObject player=game.getObjectsManager().getPlayer();
-        GameObject ball=game.getObjectsManager().getBall();
+        GameObject player=playingState.getObjectsManager().getPlayer();
+        GameObject ball=playingState.getObjectsManager().getBall();
         Rectangle ballRectangle = new Rectangle(ball.getPosX(), ball.getPosY(), ball.getWidth(), ball.getHeight());
         Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY()+1, player.getWidth(), 1);
         if (ballRectangle.intersects(playerRectangle)) {
@@ -44,8 +44,8 @@ public class Collider {
         }
     }
     public void BallPaddleCollider() {
-        GameObject ball = game.getObjectsManager().getBall();
-        GameObject player = game.getObjectsManager().getPlayer();
+        GameObject ball = playingState.getObjectsManager().getBall();
+        GameObject player = playingState.getObjectsManager().getPlayer();
         if (RectCircleColliding(player.getPosX(), player.getWidth(), player.getPosY()+1, player.getHeight())) {
             System.out.println("Hit");
             if ((ball.getPosY() + (ball.getHeight() * 2) / 3 > player.getPosY())) {
@@ -64,7 +64,7 @@ public class Collider {
     }
 
     public boolean RectCircleColliding(int xBrick, int wBrick, int yBrick, int hBrick) {
-        GameObject ball=game.getObjectsManager().getBall();
+        GameObject ball=playingState.getObjectsManager().getBall();
         int distX = Math.abs(ball.getPosX() + ball.getWidth() / 2 - (xBrick + wBrick / 2));
         int distY = Math.abs(ball.getPosY() + ball.getWidth() / 2 - (yBrick + hBrick / 2));
 
@@ -87,9 +87,9 @@ public class Collider {
     }
 
     public void BallBrickCollider() {
-        Ball ball=(Ball)game.getObjectsManager().getBall();
-        for (int i = 0; i < game.getObjectsManager().getObjects().size(); ++i) {
-            GameObject obj = game.getObjectsManager().getObjects().get(i);
+        Ball ball=(Ball)playingState.getObjectsManager().getBall();
+        for (int i = 0; i < playingState.getObjectsManager().getObjects().size(); ++i) {
+            GameObject obj = playingState.getObjectsManager().getObjects().get(i);
             if (obj.getTag().equals("brick")) {//it ball //br brick
                 float brickx = obj.getPosX();
                 float bricky = obj.getPosY();
@@ -169,7 +169,7 @@ public class Collider {
     }
     public void BallBrickResponse(int dirindex) {
         // dirindex 0: Left, 1: Top, 2: Right, 3: Bottom
-        Ball ball=(Ball)game.getObjectsManager().getBall();
+        Ball ball=(Ball)playingState.getObjectsManager().getBall();
         // Direction factors
         int mulx = 1;
         int muly = 1;
@@ -227,9 +227,9 @@ public class Collider {
         //ball->SetDirection(mulx*ball->dirx, muly*ball->diry);
     }
     public void MagicPlayerCollider() {
-        GameObject player=game.getObjectsManager().getPlayer();
-        for (int i = 0; i < game.getObjectsManager().getObjects().size(); ++i) {
-            GameObject obj = game.getObjectsManager().getObjects().get(i);
+        GameObject player=playingState.getObjectsManager().getPlayer();
+        for (int i = 0; i < playingState.getObjectsManager().getObjects().size(); ++i) {
+            GameObject obj = playingState.getObjectsManager().getObjects().get(i);
             if (obj.getTag().equals("magic")) {
                 Rectangle magicRectangle = new Rectangle(obj.getPosX(), obj.getPosY(), obj.getWidth(), obj.getHeight());
                 Rectangle playerRectangle = new Rectangle(player.getPosX(), player.getPosY() , player.getWidth(), 1);

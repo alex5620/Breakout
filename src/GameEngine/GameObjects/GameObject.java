@@ -1,10 +1,10 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Game;
 import GameEngine.Renderer;
+import GameEngine.States.PlayState.PlayingState;
 
 public abstract class GameObject {
-    protected Game game;
+    protected PlayingState playingState;
     protected String tag;//ne ajuta sa identificam obiectele in tabloul cu obiecte
     protected int posX, posY;
     protected int width, height;

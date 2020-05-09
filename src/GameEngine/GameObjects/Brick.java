@@ -1,46 +1,19 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Game;
 import GameEngine.Image;
 import GameEngine.Renderer;
+import GameEngine.States.PlayState.PlayingState;
 
 public class Brick extends GameObject {
     private static int bricksNumber=0;//contorizeaza numarul de caramizi
     private int hitsRemained;//unele caraminzi sunt ditruse din prima lovitura, altele nu
     private boolean specialBrick;
     private Image objectImage[];
-    public Brick(Game game, int posX, int posY, int imageIndex, int hitsRemained) {
+    public Brick(PlayingState playingState) {
         ++bricksNumber;
+        this.playingState=playingState;
         this.tag = "brick";
-        this.posX = posX;
-        this.posY = posY;
-        objectImage=new Image[hitsRemained];
-        this.objectImage[0] = game.getImagesLoader().getBrickImage(imageIndex);
-        if(hitsRemained==2)
-        {
-            this.objectImage[1] = game.getImagesLoader().getBrickImage(imageIndex+5);
-            specialBrick=true;
-        }
-        this.width=objectImage[0].getWidth();
-        this.height=objectImage[0].getHeight();
-        this.hitsRemained = hitsRemained;
     }
-    /*public Brick(int posX, int posY, Image image[], int hitsRemained) {
-        ++bricksNumber;
-        this.tag = "brick";
-        this.posX = posX;
-        this.posY = posY;
-        this.width=image[0].getWidth();
-        this.height=image[0].getHeight();
-        objectImage=new Image[2];
-        this.objectImage[0] = image[0];
-        this.objectImage[1] = image[1];
-        this.hitsRemained = hitsRemained;
-        if(hitsRemained==2)
-        {
-            specialBrick=true;
-        }
-    }*/
     public static int getBricksNumber()
     {
         return bricksNumber;
@@ -64,8 +37,28 @@ public class Brick extends GameObject {
         super.setDead(dead);
         --bricksNumber;
     }
+    public GameObject setDetails(int posX, int posY, int imageIndex, int hitsRemained)
+    {
+        this.posX = posX;
+        this.posY = posY;
+        this.hitsRemained = hitsRemained;
+        objectImage=new Image[this.hitsRemained];
+        objectImage[0] = playingState.getImagesLoader().getImage("brick"+imageIndex);
+        if(this.hitsRemained==2)
+        {
+            objectImage[1] = playingState.getImagesLoader().getImage("brick"+(imageIndex+5));
+            specialBrick=true;
+        }
+        this.width=objectImage[0].getWidth();
+        this.height=objectImage[0].getHeight();
+        return this;
+    }
     public void decrementHitsRemained()
     {
         --hitsRemained;
+    }
+    public static void resetBrickNumber()
+    {
+        bricksNumber=0;
     }
 }

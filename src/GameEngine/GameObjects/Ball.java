@@ -1,8 +1,9 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Game;
 import GameEngine.Image;
 import GameEngine.Renderer;
+import GameEngine.States.PlayState.PlayingState;
+
 import java.awt.event.KeyEvent;
 
 public class Ball extends GameObject {
@@ -10,24 +11,24 @@ public class Ball extends GameObject {
     private int velX;
     private int velY;
     private boolean move=false;
-    public Ball(Game game) {
-        this.game = game;
+    public Ball(PlayingState playingState) {
+        this.playingState = playingState;
         this.tag = "ball";
-        this.objectImage = game.getImagesLoader().getBallImage();
+        this.objectImage = playingState.getImagesLoader().getImage("ball");
         this.width=objectImage.getWidth();
         this.height=objectImage.getHeight();
         setToInitialPosition();
     }
     @Override
     public void update() {
-        if(game.getState()== Game.STATE.pause)//cand e pauza, obiectele nu mai sunt updatate
+        if(playingState.IsPaused()== true)//cand e pauza, obiectele nu mai sunt updatate
         {
             return;
         }
-        if(game.getKeyboardInput().isKey(KeyEvent.VK_SPACE))
+        if(playingState.getKeyboardInput().isKey(KeyEvent.VK_SPACE))
         {
-            if(game.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
-                game.setInstructionsPresented();
+            if(playingState.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
+                playingState.setInstructionsPresented();
                 move = true;               //si suntem in acel moment in care trebuie sa apasam enter pentru
             }                              //a trece la level-ul urmator, daca noi apasam space in loc de enter
         }                                  //atunci mingea ar incepe sa se miste, desi nu am confirmat
@@ -39,8 +40,8 @@ public class Ball extends GameObject {
         }
         else
         {
-            int playerX=game.getObjectsManager().getPlayerX();
-            int playerWidth=game.getObjectsManager().getPlayerWidth();
+            int playerX=playingState.getObjectsManager().getPlayerX();
+            int playerWidth=playingState.getObjectsManager().getPlayerWidth();
             posX=playerX+playerWidth/2-width/2;//intre levele, dar si la inceperea unui nou level
         }                          //inainte de a apasa tasta space pentru a da voie mingii sa se miste normal
                                    //aceasta se misca pe axa OX odata concomitent cu player-ul
@@ -66,21 +67,21 @@ public class Ball extends GameObject {
         }
         if  (posY>limit)//verificare margine jos
         {
-            game.changePlayerLives(-1);
-            game.getObjectsManager().setPlayerNormalMovement();
+            playingState.changePlayerLives(-1);
+            playingState.getObjectsManager().setPlayerNormalMovement();
             setToInitialPosition();
         }
     }
     public void setToInitialPosition()//mingea este pozitionata deasupra player-ului
     {
-        this.posX=game.getObjectsManager().getPlayerX()+game.getObjectsManager().getPlayerWidth()/2;
-        this.posY=game.getObjectsManager().getPlayerY()-height;
+        this.posX=playingState.getObjectsManager().getPlayerX()+playingState.getObjectsManager().getPlayerWidth()/2;
+        this.posY=playingState.getObjectsManager().getPlayerY()-height;
         setInitialVelocities();//se stabile vitezele pe axele OX, OY
     }
     private void setInitialVelocities()
     {
         this.velX=0;
-        this.velY=-5-(game.getLevel()+1)/2;
+        this.velY=-5-(playingState.getLevel()+1)/2;
         move=false;
     }
     public void reverseVelX() {
