@@ -1,7 +1,7 @@
 package GameEngine.States;
 
 import GameEngine.GameEngine;
-import GameEngine.Renderer;
+import GameEngine.Graphics.Renderer;
 
 public class AboutMenuState extends State {
     public AboutMenuState(GameEngine gameEngine) {
@@ -9,8 +9,9 @@ public class AboutMenuState extends State {
     }
     @Override
     public void update() {
-        if (gameEngine.getMouseInput().isClick1Up() && checkIfBack()) {
+        if (gameEngine.getMouseInput().isClickOnePressedOnce() && checkIfBack()) {
             gameEngine.setState(GameEngine.STATE.MainMenuState);
+            gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
         }
     }
     @Override

@@ -1,95 +1,84 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Image;
-import GameEngine.Renderer;
+import GameEngine.Graphics.ImageTile;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.PlayState.PlayingState;
 
 public class MagicObject extends GameObject {
-    private Image objectImage;
-    enum Type{reverse, smaller, bigger, slower, faster, life, bonus100, bonus250, bonus500};
-    private Type type;
+    private ImageTile objectImage;
+    private int width;
+    private int height;
+    private int tileX;
+    private int tileY;
     public MagicObject(PlayingState playingState)
     {
         this.playingState=playingState;
         this.tag = "magic";
     }
     @Override
-    public void update() {
-        if(playingState.IsPaused()==true)//obiectele nu mai sunt updatate in pauza
-            return;
-        posY+=2;
+    public void update()
+    {
+        moveY();
     }
     @Override
-    public void render(Renderer r) {
-        r.drawImage(objectImage,(int) posX,(int) posY);
+    public void render(Renderer renderer) {
+        renderer.drawImageTile(objectImage, posX, posY, tileX, tileY);
     }
-    @Override
-    public void setDead(boolean dead) {
-        super.setDead(dead);
-    }
-    public GameObject setDetails(int posX, int posY, Type type)
+    public GameObject setDetails(int posX, int posY, int tileX, int tileY)
     {
         this.posX=posX;
         this.posY=posY;
-        this.type=type;
-        setObjectType();
-        this.width=objectImage.getWidth();
-        this.height=objectImage.getHeight();
+        this.tileX=tileX;
+        this.tileY=tileY;
+        objectImage = (ImageTile)playingState.getImagesLoader().getImage("bonuses");
+        this.width=objectImage.getTileWidth();
+        this.height=objectImage.getTileHeight();
         return this;
     }
-
-    public void setObjectType() {//se alege imaginea corespunzatoare in functie de tipul obiectului
-        switch (type) {
-            case reverse: objectImage = playingState.getImagesLoader().getImage("reverse");
+    public void executeCommand()
+    {
+        switch (""+tileX+tileY) {
+            case "31":
+                playingState.getObjectsManager().setPaddleReversedMovement();
                 break;
-            case bigger: objectImage = playingState.getImagesLoader().getImage("bigger");
+            case "11":
+                playingState.getObjectsManager().changePaddleSize(1);
                 break;
-            case smaller: objectImage=playingState.getImagesLoader().getImage("smaller");
+            case "01":
+                playingState.getObjectsManager().changePaddleSize(-1);
                 break;
-            case slower: objectImage=playingState.getImagesLoader().getImage("slower");
+            case "30":
+                playingState.getObjectsManager().changePaddleSpeed(-1);
                 break;
-            case faster: objectImage=playingState.getImagesLoader().getImage("faster");
+            case "40":
+                playingState.getObjectsManager().changePaddleSpeed(1);
+                playingState.getObjectsManager().incrementBallYVel();
                 break;
-            case life: objectImage=playingState.getImagesLoader().getImage("life");
+            case "41":
+                playingState.getObjectsManager().changePaddleLives(1);
                 break;
-            case bonus100: objectImage=playingState.getImagesLoader().getImage("bonus100");
+            case "00":
+                playingState.incrementScore(100);
                 break;
-            case bonus250: objectImage=playingState.getImagesLoader().getImage("bonus250");
+            case "10":
+                playingState.incrementScore(250);
                 break;
-            case bonus500: objectImage=playingState.getImagesLoader().getImage("bonus500");
+            case "20":
+                playingState.incrementScore(500);
+                break;
+            case "21":
+                playingState.getObjectsManager().addLaser();
+                break;
         }
     }
-    public void executeCommand()//se executa comanda corespunzatoare in functie de tipul obiectului
+    public void moveY()
     {
-        switch (type) {
-            case reverse:
-                playingState.getObjectsManager().setPlayerReversedMovement();
-                break;
-            case bigger:
-                playingState.getObjectsManager().changePlayerSize(1);
-                break;
-            case smaller:
-                playingState.getObjectsManager().changePlayerSize(-1);
-                break;
-            case slower:
-                playingState.getObjectsManager().changePlayerSpeed(-1);
-                break;
-            case faster:
-                playingState.getObjectsManager().changePlayerSpeed(1);
-                playingState.getObjectsManager().incrementBallSpeed();
-                break;
-            case life:
-                playingState.getObjectsManager().changePlayerLives(1);
-                break;
-            case bonus100:
-                playingState.increaseScore(100);
-                break;
-            case bonus250:
-                playingState.increaseScore(250);
-                break;
-            case bonus500:
-                playingState.increaseScore(500);
-                break;
-        }
+        posY+=2;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
     }
 }

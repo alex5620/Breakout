@@ -4,7 +4,8 @@ import GameEngine.GameEngine;
 import GameEngine.GameInput.KeyboardInput;
 import GameEngine.GameObjects.*;
 import GameEngine.Loaders.ImagesLoader;
-import GameEngine.Renderer;
+import GameEngine.Loaders.SoundsLoader;
+import GameEngine.Graphics.Renderer;
 import GameEngine.Collider;
 import GameEngine.States.State;
 
@@ -15,48 +16,63 @@ public class PlayingState extends State {
     private ObjectsManager objectsManager;
     private Collider collider;
     private int score;
-    private boolean isPaused, levelPassed;
+    private boolean paused;
+    private boolean levelPassed;
     private int level;
     private boolean instructionsPresented;
+    private int difficulty;
     public PlayingState(GameEngine gameEngine, PlayState playState) {
         super(gameEngine);
+        gameEngine.getSoundsLoader().getSound("menu").stop();
+        gameEngine.getSoundsLoader().getSound("background").loop();
         this.playState=playState;
         objectsManager=new ObjectsManager(this);
         levelPassed = false;
-        isPaused=false;
+        paused =false;
         instructionsPresented=gameEngine.getSettings().getInstructionsPresented();
-        init();
+        if(gameEngine.getSettings().getIsEasy()==true)
+        {
+            difficulty=1;
+        }
+        else
+        {
+            difficulty=2;
+        }
+        initialize();
     }
-    public void init() {
-        ObjectFactory factory=ObjectFactory.getInstance();
+    public void initialize() {
+        ObjectsFactory factory= ObjectsFactory.getInstance();
         level=1;
         objectsManager.addObject(factory.getObject(this, "player"));
         objectsManager.addObject(factory.getObject(this, "ball"));
-        MapGenerator.generateMap(this,level);
+        MapGenerator.generateMap(this,level, difficulty);
         collider = new Collider(this);
         score=0;
     }
     @Override
     public void update() {
-        if(getKeyboardInput().isKeyUp(KeyEvent.VK_P))//pauza joc
+        if(getKeyboardInput().isKeyPressedOnce(KeyEvent.VK_P))
         {
             setPause();
         }
         int x = gameEngine.getMouseInput().getX();
         int y = gameEngine.getMouseInput().getY();
-        if (isPaused == true) {
-            if (gameEngine.getMouseInput().isClick1Up() && checkIfExit(x, y)) {
+        if (paused == true) {
+            if (gameEngine.getMouseInput().isClickOnePressedOnce() && checkIfExit(x, y)) {
+                gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
+                Brick.resetBricksNumber();
                 gameEngine.updateHighscores(score);
                 gameEngine.getSettings().setScore(score);
                 gameEngine.setState(GameEngine.STATE.MainMenuState);
             }
-        } else {
-            if (getKeyboardInput().isKey(KeyEvent.VK_U)) {   //se distrug toate caramizile, in afara de una
+        }
+        else {
+            if (getKeyboardInput().isKey(KeyEvent.VK_U)) {
                 if(levelPassed==false && instructionsPresented)
-                    destroyAlmostAllBricks();              //aceasta functionalitate e lasata doar pentru verificare
+                    destroyAlmostAllBricks();
             }
-            if (getKeyboardInput().isKey(KeyEvent.VK_ENTER)) { //intre levele trebuie apasata tasta enter
-                setLeveLPassed(false);                 //pentru a putea trece la levelul urmator
+            if (getKeyboardInput().isKey(KeyEvent.VK_ENTER) && levelPassed==true) {
+                setLeveLPassed(false);
             }
             objectsManager.update();
             checkIfLevelPassed();
@@ -64,29 +80,29 @@ public class PlayingState extends State {
             collider.update();
         }
     }
-
     @Override
     public void render(Renderer renderer) {
         int x = gameEngine.getMouseInput().getX();
         int y = gameEngine.getMouseInput().getY();
-        if(isPaused)
+        renderer.drawImage(gameEngine.getImagesLoader().getImage("background"), 0, 0);
+        if(paused)
         {
-            renderer.drawImage(gameEngine.getImagesLoader().getImage("background"), 0, 0);
+            objectsManager.render(gameEngine.getRenderer());
             renderer.drawImage(gameEngine.getImagesLoader().getImage("pause"), 120, 70);
             renderer.drawImage(gameEngine.getImagesLoader().getImage("exit"), 619, 580);
-            objectsManager.render(gameEngine.getRenderer());
+            renderer.drawMarks(gameEngine);
             if(checkIfExit(x, y))
                 renderer.drawImage(gameEngine.getImagesLoader().getImage("exit2"), 614, 575);
             printLevel_Score(renderer);
             renderPlayerLives(renderer);
         }
         else {
-            renderer.drawImage(gameEngine.getImagesLoader().getImage("background"), 0, 0);
             objectsManager.render(gameEngine.getRenderer());
             if(levelPassed) {
                 printLevelPassedMessage(renderer);
             }else {
-                if (level == 1 && ((Ball) objectsManager.getBall()).isMoving() == false && !instructionsPresented) {
+                renderer.drawMarks(gameEngine);
+                if (level == 1 && (objectsManager.getBall()).isMoving() == false && !instructionsPresented) {
                     renderer.drawImage(gameEngine.getImagesLoader().getImage("howtoplay"), 150, 250);
                 }
                 printLevel_Score(renderer);
@@ -94,18 +110,26 @@ public class PlayingState extends State {
             }
         }
     }
-    public void checkIfLevelPassed()//0 bricks ramase-> level up
+    private void renderPlayerLives(Renderer renderer)
+    {
+        int lives=objectsManager.getPaddleLives();
+        for(int i=0;i<lives;++i) {
+            renderer.drawImage(gameEngine.getImagesLoader().getImage("heart"), 135+i*20, 14);
+        }
+    }
+    public void checkIfLevelPassed()
     {
         if (Brick.getBricksNumber() == 0) {
             if(level==5)
             {
+                score+=objectsManager.getPaddleLives()*300;
                 gameEngine.updateHighscores(score);
                 gameEngine.getSettings().setScore(score);
                 playState.setCurrentPState(PlayState.PState.WonState);
             }
             else {
                 if(level<5) {
-                    objectsManager.destroyAllBonuses();
+                    objectsManager.destroyBonusesAndLaser();
                     ++level;
                     levelPassed = true;
                     LoadNewLevel();
@@ -115,9 +139,9 @@ public class PlayingState extends State {
     }
     public void LoadNewLevel()
     {
-        objectsManager.setPlayerBallToInitial();
-        objectsManager.setPlayerNormalMovement();
-        MapGenerator.generateMap(this,level);
+        objectsManager.setPaddleBallToInitial();
+        objectsManager.setPaddleNormalMovement();
+        MapGenerator.generateMap(this,level, difficulty);
     }
     public void printLevelPassedMessage(Renderer renderer)
     {
@@ -126,31 +150,31 @@ public class PlayingState extends State {
     }
     public void printLevel_Score(Renderer renderer)
     {
-        renderer.drawText("Level" + level, 30, 6, 0xffff0000);
-        renderer.drawText("SCORE: " + score, 600, 7, 0xffff0000);
+        renderer.drawText("Level" + level, 30, 6, 0xff00ff00);
+        renderer.drawText("SCORE: " + score, 600, 7, 0xff00ff00);
     }
-    public void incremetScore() {
-        score += 5*level;
+    public void incrementScore(int score)
+    {
+        this.score+=score;
+    }
+    public void increaseScore(int value) {
+        score += 5*level*value;
     }
     public void setLost() {
         gameEngine.updateHighscores(score);
         gameEngine.getSettings().setScore(score);
         playState.setCurrentPState(PlayState.PState.LostState);
     }
+    public void checkIfLost()
+    {
+        if(objectsManager.getPaddleLives()==0)
+        {
+            setLost();
+        }
+    }
     public void setLeveLPassed(boolean levelPassed)
     {
         this.levelPassed=levelPassed;
-    }
-    private void renderPlayerLives(Renderer renderer)
-    {
-        int lives=objectsManager.getPlayerLives();
-        for(int i=0;i<lives;++i) {
-            renderer.drawImage(gameEngine.getImagesLoader().getImage("heart"), 135+i*20, 14);
-        }
-    }
-    public void changePlayerLives(int life)
-    {
-        objectsManager.changePlayerLives(life);
     }
     public void destroyAlmostAllBricks() {
         objectsManager.destroyAlmostAllBricks();
@@ -158,21 +182,19 @@ public class PlayingState extends State {
     public boolean getLevelPassed() { return levelPassed; }
     public ObjectsManager getObjectsManager() { return objectsManager; }
     public ImagesLoader getImagesLoader() { return gameEngine.getImagesLoader(); }
-    public void checkIfLost()
-    {
-        if(objectsManager.getPlayerLives()==0)
-        {
-            setLost();
-        }
-    }
-    public void increaseScore(int score)
-    {
-        this.score+=score;
-    }
+    public SoundsLoader getSoundsLoader(){ return gameEngine.getSoundsLoader(); }
     public void setPause()
     {
         if(levelPassed==false) {
-            isPaused =!isPaused;
+            paused =!paused;
+            if(paused)
+            {
+                gameEngine.getSoundsLoader().getSound("background").stop();
+            }
+            else
+            {
+                gameEngine.getSoundsLoader().getSound("background").loop();
+            }
         }
     }
     public int getLevel()
@@ -194,6 +216,9 @@ public class PlayingState extends State {
     }
     public boolean IsPaused()
     {
-        return isPaused;
+        return paused;
+    }
+    public int getDifficulty(){
+        return difficulty;
     }
 }

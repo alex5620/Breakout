@@ -1,14 +1,18 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Image;
-import GameEngine.Renderer;
+import GameEngine.Graphics.ImageTile;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.PlayState.PlayingState;
 
+
 public class Brick extends GameObject {
-    private static int bricksNumber=0;//contorizeaza numarul de caramizi
-    private int hitsRemained;//unele caraminzi sunt ditruse din prima lovitura, altele nu
+    private static int bricksNumber=0;
+    private int hitsRemained;
     private boolean specialBrick;
-    private Image objectImage[];
+    private int height;
+    private int width;
+    private int imageIndex;
+    private ImageTile objectImage;
     public Brick(PlayingState playingState) {
         ++bricksNumber;
         this.playingState=playingState;
@@ -18,6 +22,10 @@ public class Brick extends GameObject {
     {
         return bricksNumber;
     }
+    public static void resetBricksNumber()
+    {
+        bricksNumber=0;
+    }
     @Override
     public void update() {
         if(hitsRemained==0)
@@ -26,39 +34,58 @@ public class Brick extends GameObject {
         }
     }
     @Override
-    public void render(Renderer r) {
-        if(specialBrick)
-            r.drawImage(objectImage[hitsRemained%2],posX, posY);//randam imaginea corespunzatoare
-        else                                      //in functie de numarul de lovituri ramase
-            r.drawImage(objectImage[0], posX, posY);
+    public void render(Renderer renderer) {
+        if (specialBrick) {
+            if (hitsRemained == 2)
+                renderer.drawImageTile(objectImage, posX, posY, imageIndex, 0);
+            else
+                renderer.drawImageTile(objectImage, posX, posY, imageIndex, 1);
+        } else {
+            renderer.drawImageTile(objectImage, posX, posY, imageIndex, 0);
+        }
     }
     @Override
     public void setDead(boolean dead) {
+        playingState.getSoundsLoader().getSound("brickDestroyed").play();
         super.setDead(dead);
         --bricksNumber;
     }
-    public GameObject setDetails(int posX, int posY, int imageIndex, int hitsRemained)
+    public GameObject setDetails(int posX, int posY, int imageIndex, int hitsRemained, int difficulty)
     {
         this.posX = posX;
         this.posY = posY;
         this.hitsRemained = hitsRemained;
-        objectImage=new Image[this.hitsRemained];
-        objectImage[0] = playingState.getImagesLoader().getImage("brick"+imageIndex);
+        if(difficulty==1) {
+            objectImage = (ImageTile) playingState.getImagesLoader().getImage("bricks");
+        }
+        else
+        {
+            objectImage = (ImageTile) playingState.getImagesLoader().getImage("sbricks");
+        }
+        this.imageIndex=imageIndex;
+        this.width=objectImage.getTileWidth();
+        this.height=objectImage.getTileHeight();
         if(this.hitsRemained==2)
         {
-            objectImage[1] = playingState.getImagesLoader().getImage("brick"+(imageIndex+5));
             specialBrick=true;
         }
-        this.width=objectImage[0].getWidth();
-        this.height=objectImage[0].getHeight();
         return this;
     }
     public void decrementHitsRemained()
     {
+        if(hitsRemained==2) {
+            playingState.getSoundsLoader().getSound("ballBouncing").play();
+        }
         --hitsRemained;
     }
-    public static void resetBrickNumber()
+    public int getHeight() {
+        return height;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public boolean isSpecialBrick()
     {
-        bricksNumber=0;
+        return specialBrick;
     }
 }

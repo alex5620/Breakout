@@ -1,6 +1,7 @@
 package GameEngine.States;
 import GameEngine.GameEngine;
-import GameEngine.Renderer;
+import GameEngine.Graphics.Renderer;
+
 
 public abstract class State{
     protected GameEngine gameEngine;

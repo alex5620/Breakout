@@ -1,8 +1,7 @@
 package GameEngine.States.PlayState;
 
 import GameEngine.GameEngine;
-import GameEngine.GameObjects.Brick;
-import GameEngine.Renderer;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.State;
 
 public class PlayState extends State {
@@ -10,7 +9,6 @@ public class PlayState extends State {
     public enum PState {PlayingState, WonState, LostState};
     public PlayState(GameEngine gameEngine) {
         super(gameEngine);
-        Brick.resetBrickNumber();
         currentPState=new PlayingState(gameEngine, this);
     }
     @Override

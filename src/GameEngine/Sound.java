@@ -2,18 +2,18 @@ package GameEngine;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class Sound{
-    private Clip clip=null;
+    private static boolean soundEnabled=true;
+    private Clip clip;
     private FloatControl gainControl;
-
     public Sound(String path)
     {
+        clip=null;
         try {
-            InputStream audioSrc= Sound.class.getResourceAsStream(path);
-            InputStream bufferedIn=new BufferedInputStream(audioSrc);
+            InputStream audioSource= Sound.class.getResourceAsStream(path);
+            InputStream bufferedIn=new BufferedInputStream(audioSource);
             AudioInputStream ais= AudioSystem.getAudioInputStream(bufferedIn);
             AudioFormat baseFormat=ais.getFormat();
             AudioFormat decodeFormat= new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
@@ -24,20 +24,27 @@ public class Sound{
             clip.open(dais);
             gainControl=(FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
 
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e ) {
+        } catch (Exception e ) {
             e.printStackTrace();
         }
     }
+    public static void reverseSoundSettings()
+    {
+        soundEnabled=!soundEnabled;
+    }
+    public static boolean isSoundEnabled()
+    {
+        return soundEnabled;
+    }
     public void play()
     {
-        if(clip==null)
+        if(soundEnabled==false)
         {
             return;
         }
-        stop();
-        clip.setFramePosition(0);
-        while(!clip.isRunning())
+        if(clip.isRunning()==false)
         {
+            clip.setFramePosition(0);
             clip.start();
         }
     }
@@ -45,5 +52,19 @@ public class Sound{
         if (clip.isRunning()) {
             clip.stop();
         }
+    }
+    public void loop()
+    {
+        if(soundEnabled==false)
+        {
+            return;
+        }
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+        play();
+    }
+    public Sound setVolume(float value)
+    {
+        gainControl.setValue(value);
+        return this;
     }
 }

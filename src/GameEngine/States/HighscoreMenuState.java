@@ -1,29 +1,33 @@
 package GameEngine.States;
 
 import GameEngine.GameEngine;
-import GameEngine.Renderer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import GameEngine.Graphics.Renderer;
+
+import java.util.*;
 
 public class HighscoreMenuState extends State {
-    public HighscoreMenuState(GameEngine gameEngine) {
+    private LinkedHashMap<String, Integer> records;
+    public HighscoreMenuState(GameEngine gameEngine)
+    {
         super(gameEngine);
+        records = gameEngine.getHighscore().getUsers();
     }
-
     @Override
     public void update() {
         int x = gameEngine.getMouseInput().getX();
         int y = gameEngine.getMouseInput().getY();
-        if (gameEngine.getMouseInput().isClick1Up()) {
+        if (gameEngine.getMouseInput().isClickOnePressedOnce()) {
             if (checkIfBack(x, y)) {
+                gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
                 gameEngine.setState(GameEngine.STATE.MainMenuState);
             }
             if (checkIfReset(x, y)) {
-               gameEngine.getHighscore().deleteAllUser();
+                gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
+               gameEngine.getHighscore().deleteAllUsers();
+               records = gameEngine.getHighscore().getUsers();
             }
         }
     }
-
     @Override
     public void render(Renderer renderer) {
         int x = gameEngine.getMouseInput().getX();
@@ -31,16 +35,17 @@ public class HighscoreMenuState extends State {
         renderer.drawImage(gameEngine.getImagesLoader().getImage("highscoresmenu"), 0, 0);
         renderer.drawText("High scores", 300, 175, 0xffff0606);
         renderer.drawText("Pos     Name                                    Score", 135, 230, 0xffff0606);
-        try {
-            ResultSet rs = gameEngine.getHighscore().displayUsers();
-            int i = 1;
-            while (rs.next()) {
-                renderer.drawText(i + ") ", 145, 240 + i * 30, 0xffff0606);
-                renderer.drawText(rs.getString("name"), 205, 240 + i * 30, 0xffff0606);
-                renderer.drawText(rs.getInt("score") + "", 545, 240 + i * 30, 0xffff0606);
-                i++;
+        if(records!=null) {
+            Object[] set = records.keySet().toArray();
+            int length = set.length;
+            for (int i = 0; i < length; ++i) {
+                renderer.drawText((i + 1) + ") ", 145, 240 + (i + 1) * 30, 0xffff0606);
+                renderer.drawText(set[i] + "", 205, 240 + (i + 1) * 30, 0xffff0606);
+                renderer.drawText(records.get(set[i]) + "", 545, 240 + (i + 1) * 30, 0xffff0606);
             }
-        } catch (SQLException e) {
+        }
+        else
+        {
             renderer.drawText("No records.", 170, 270, 0xffff0606);
         }
         if(checkIfBack(x, y))

@@ -1,7 +1,8 @@
 package GameEngine.States.PlayState;
 
 import GameEngine.GameEngine;
-import GameEngine.Renderer;
+import GameEngine.GameObjects.Brick;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.State;
 
 public class LostState extends State {
@@ -10,44 +11,48 @@ public class LostState extends State {
     public LostState(GameEngine gameEngine, PlayState playState) {
         super(gameEngine);
         this.playState=playState;
+        Brick.resetBricksNumber();
         score=gameEngine.getSettings().getScore();
+        gameEngine.getSoundsLoader().getSound("background").stop();
+        gameEngine.getSoundsLoader().getSound("gameLost").play();
     }
-
     @Override
     public void update() {
-        if(gameEngine.getMouseInput().isClick1Up()) {
+        if(gameEngine.getMouseInput().isClickOnePressedOnce()) {
             int x = gameEngine.getMouseInput().getX();
             int y = gameEngine.getMouseInput().getY();
             if (checkIfPlayAgain(x, y)) {
+                gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
                 playState.setCurrentPState(PlayState.PState.PlayingState);
             }
-            if (checkIfGoToMenuAfterLosing(x, y)) {
+            if (checkIfGoBack(x, y)) {
+                gameEngine.getSoundsLoader().getSound("buttonPressed2").play();
                 gameEngine.setState(GameEngine.STATE.MainMenuState);
             }
         }
     }
-
     @Override
     public void render(Renderer renderer) {
         int x=gameEngine.getMouseInput().getX();
         int y=gameEngine.getMouseInput().getY();
+        renderer.drawImage(gameEngine.getImagesLoader().getImage("background"), 0, 0);
         printLoseMessage(renderer);
-        renderer.drawImage(gameEngine.getImagesLoader().getImage("lostmenu"), 0, 0);
         if(checkIfPlayAgain(x, y))
         {
             renderer.drawImage(gameEngine.getImagesLoader().getImage("playagain"), 272, 215);
         }
-        if(checkIfGoToMenuAfterLosing(x, y))
+        if(checkIfGoBack(x, y))
         {
             renderer.drawImage(gameEngine.getImagesLoader().getImage("backtomenu"), 240, 293);
         }
     }
     public void printLoseMessage(Renderer renderer)
     {
+        renderer.drawImage(gameEngine.getImagesLoader().getImage("losttext"), 250, 165);
         renderer.drawText("    GAME OVER", 275, 60, 0xff0000ff);
         renderer.drawText("     SCORE: " + score, 280, 100, 0xff0000ff);
     }
-    public boolean checkIfGoToMenuAfterLosing(int x, int y)
+    public boolean checkIfGoBack(int x, int y)
     {
         if((x > 230) && (x < 520) && (y > 295) && (y < 348))
         {

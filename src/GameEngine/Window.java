@@ -2,8 +2,6 @@ package GameEngine;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -12,34 +10,44 @@ public class Window {
     private JFrame frame;
     private BufferedImage image;
     private Canvas canvas;
-    private BufferStrategy bs;
+    private BufferStrategy bufferStrategy;
     private Graphics graphics;
-    public Window(GameEngine gc)
-    {
-        image=new BufferedImage(gc.getWidth(), gc.getHeight(), BufferedImage.TYPE_INT_RGB);//buffer= store in the RAM
-        canvas=new Canvas();
-        Dimension s=new Dimension((int)(gc.getWidth()*gc.getScale()),(int) (gc.getHeight() * gc.getScale()));
-        canvas.setPreferredSize(s);
-        canvas.setMaximumSize(s);
-        canvas.setMinimumSize(s);
+    private final String title;
+    private final int width;
+    private final int height;
 
-        frame=new JFrame(gc.getTitle());//setare titlu
+    public Window(String title, int width, int height)
+    {
+        this.title=title;
+        this.width=width;
+        this.height=height;
+    }
+    public void BuildGameWindow()
+    {
+        image=new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        canvas=new Canvas();
+        Dimension dim=new Dimension(width,height);
+        canvas.setPreferredSize(dim);
+        canvas.setMaximumSize(dim);
+        canvas.setMinimumSize(dim);
+        frame=new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.add(canvas, BorderLayout.CENTER);
-        frame.pack();//frameul va avea dimensiunea egala cu cea a canvas
-        frame.setLocationRelativeTo(null);//fereastra va aparea in mijlocul ecranului
+        frame.add(canvas);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
-        canvas.createBufferStrategy(2);
-        bs=canvas.getBufferStrategy();
-        graphics=bs.getDrawGraphics();
+        canvas.createBufferStrategy(3);
+        bufferStrategy =canvas.getBufferStrategy();
+        graphics= bufferStrategy.getDrawGraphics();
     }
 
     public void update()
     {
         graphics.drawImage(image,0,0, canvas.getWidth(), canvas.getHeight(), null);
-        bs.show();
+        bufferStrategy.show();
     }
     public Canvas getCanvas()
     {
@@ -52,5 +60,11 @@ public class Window {
     public void closeWindow()
     {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
     }
 }

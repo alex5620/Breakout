@@ -1,15 +1,18 @@
 package GameEngine.GameInput;
 
 import GameEngine.GameEngine;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 
 public class KeyboardInput implements KeyListener {
     private final int NUM_KEYS=256;
-    private boolean [] keys=new boolean[NUM_KEYS];
-    private boolean [] keysLast=new boolean[NUM_KEYS];//starea key-urilor la ultimul frame
-
+    private boolean [] keys;
+    private boolean [] keysLast;
     public KeyboardInput(GameEngine engine)
     {
+        keys=new boolean[NUM_KEYS];
+        keysLast=new boolean[NUM_KEYS];
         engine.getWindow().getCanvas().addKeyListener(this);
     }
 
@@ -24,12 +27,9 @@ public class KeyboardInput implements KeyListener {
     {
         return keys[keyCode];
     }
-    public boolean isKeyUp(int keyCode)//key a fost apasata in frame-ul trecut, dar a fost eliberat in acest frame
+    public boolean isKeyPressedOnce(int keyCode)
     {
         return !keys[keyCode] && keysLast[keyCode];
-    }
-    @Override
-    public void keyTyped(KeyEvent e) {
     }
     @Override
     public void keyPressed(KeyEvent e) {//functia este apelata de fiecare data cand apasam o tasta
@@ -39,4 +39,6 @@ public class KeyboardInput implements KeyListener {
     public void keyReleased(KeyEvent e) {
         keys[e.getKeyCode()]=false;
     }
+    @Override
+    public void keyTyped(KeyEvent e) {}
 }

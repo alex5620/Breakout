@@ -7,12 +7,14 @@ import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener, MouseMotionListener {
     private final int NUM_BUTTONS=5;
-    private boolean [] buttons=new boolean[NUM_BUTTONS];
-    private boolean [] buttonsLast=new boolean[NUM_BUTTONS];
+    private boolean [] buttons;
+    private boolean [] buttonsLast;
     private int x;
     private int y;
     public MouseInput(GameEngine gameEngine)
     {
+        buttons=new boolean[NUM_BUTTONS];
+        buttonsLast=new boolean[NUM_BUTTONS];
         gameEngine.getWindow().getCanvas().addMouseListener(this);
         gameEngine.getWindow().getCanvas().addMouseMotionListener(this);
     }
@@ -23,7 +25,7 @@ public class MouseInput implements MouseListener, MouseMotionListener {
             buttonsLast[i]=buttons[i];
         }
     }
-    public boolean isClick1Up()
+    public boolean isClickOnePressedOnce()
     {
         return !buttons[1] && buttonsLast[1];
     }
@@ -39,7 +41,6 @@ public class MouseInput implements MouseListener, MouseMotionListener {
     }
     @Override
     public void mouseEntered(MouseEvent e) {}
-
     @Override
     public void mouseExited(MouseEvent e) {}
     @Override

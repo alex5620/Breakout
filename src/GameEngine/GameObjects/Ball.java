@@ -1,87 +1,126 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Image;
-import GameEngine.Renderer;
+import GameEngine.Graphics.Image;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.PlayState.PlayingState;
 
 import java.awt.event.KeyEvent;
 
+
 public class Ball extends GameObject {
     private Image objectImage;
+    private int diameter;
     private int velX;
     private int velY;
-    private boolean move=false;
+    private boolean move;
     public Ball(PlayingState playingState) {
         this.playingState = playingState;
         this.tag = "ball";
         this.objectImage = playingState.getImagesLoader().getImage("ball");
-        this.width=objectImage.getWidth();
-        this.height=objectImage.getHeight();
+        this.diameter =objectImage.getWidth();
+        move=false;
         setToInitialPosition();
     }
     @Override
     public void update() {
-        if(playingState.IsPaused()== true)//cand e pauza, obiectele nu mai sunt updatate
-        {
-            return;
-        }
         if(playingState.getKeyboardInput().isKey(KeyEvent.VK_SPACE))
         {
-            if(playingState.getLevelPassed()==false) {//daca nu facem aceasta verificare, atunci cand trecem un level
+            if(playingState.getLevelPassed()==false && move==false) {
                 playingState.setInstructionsPresented();
-                move = true;               //si suntem in acel moment in care trebuie sa apasam enter pentru
-            }                              //a trece la level-ul urmator, daca noi apasam space in loc de enter
-        }                                  //atunci mingea ar incepe sa se miste, desi nu am confirmat
-        if(move)                           //ca dorim sa incepem urmatorul level(nu am apasat enter)
-                                           //mai exact, intre levele mingea ramane blocata,
-        {                                  //aceasta avand void sa se miste doar dupa ce apasam tasta enter
+                initializeVelX();
+                move = true;
+            }
+        }
+        if(move)
+        {
             updatePosition();
-            checkForBoundaries();
+            checkForBounds();
         }
         else
         {
-            int playerX=playingState.getObjectsManager().getPlayerX();
-            int playerWidth=playingState.getObjectsManager().getPlayerWidth();
-            posX=playerX+playerWidth/2-width/2;//intre levele, dar si la inceperea unui nou level
-        }                          //inainte de a apasa tasta space pentru a da voie mingii sa se miste normal
-                                   //aceasta se misca pe axa OX odata concomitent cu player-ul
+           moveAlongThePaddle();
+        }
     }
     @Override
-    public void render(Renderer r) {
-        r.drawImage(objectImage, posX, posY);
+    public void render(Renderer renderer) {
+        renderer.drawImage(objectImage, posX, posY);
     }
     private void updatePosition()
     {
         posX += velX;
         posY += velY;
     }
-    private void checkForBoundaries() {
-        if (posX < 0) {//verificare margine stanga
+    private void checkForBounds() {
+        if (posX < 0) {
+            playingState.getSoundsLoader().getSound("ballBouncing").play();
             reverseVelX();
         }
-        if (posY < 30) {//verificare margine sus
+        if (posY < 45) {
+            playingState.getSoundsLoader().getSound("ballBouncing").play();
             reverseVelY();
         }
-        if (posX > (limit - width)) {//verificare margine dreapta
+        if (posX > (limit - diameter)) {
+            playingState.getSoundsLoader().getSound("ballBouncing").play();
             reverseVelX();
         }
-        if  (posY>limit)//verificare margine jos
+        if  (posY>limit)
         {
-            playingState.changePlayerLives(-1);
-            playingState.getObjectsManager().setPlayerNormalMovement();
+            playingState.getObjectsManager().changePaddleLives(-1);
+            playingState.getObjectsManager().setPaddleNormalMovement();
             setToInitialPosition();
         }
     }
-    public void setToInitialPosition()//mingea este pozitionata deasupra player-ului
+    public void moveAlongThePaddle() {
+        int paddleX = playingState.getObjectsManager().getPaddleX();
+        int paddleWidth = playingState.getObjectsManager().getPaddleWidth();
+        if (posX<paddleX+paddleWidth-diameter && posX>paddleX) {
+            posX += velX;
+        }
+        else
+        {
+            if(posX<=paddleX)
+            {
+                posX=paddleX;
+                if(playingState.getKeyboardInput().isKey(KeyEvent.VK_RIGHT) ||
+                        (playingState.getKeyboardInput().isKey(KeyEvent.VK_LEFT) &&
+                        playingState.getObjectsManager().isPaddleMovementReversed()))
+                {
+                    return;
+                }
+                reverseVelX();
+            }
+            else
+            {
+                posX=paddleX+paddleWidth-diameter;
+                if(playingState.getKeyboardInput().isKey(KeyEvent.VK_LEFT) ||
+                        (playingState.getKeyboardInput().isKey(KeyEvent.VK_RIGHT) &&
+                                playingState.getObjectsManager().isPaddleMovementReversed()))
+                {
+                    return;
+                }
+                reverseVelX();
+            }
+        }
+    }
+    public void initializeVelX()
     {
-        this.posX=playingState.getObjectsManager().getPlayerX()+playingState.getObjectsManager().getPlayerWidth()/2;
-        this.posY=playingState.getObjectsManager().getPlayerY()-height;
-        setInitialVelocities();//se stabile vitezele pe axele OX, OY
+        int paddleWidth=playingState.getObjectsManager().getPaddleWidth();
+        int paddleX=playingState.getObjectsManager().getPaddleX();
+        int distance=(posX+diameter/2)-(paddleX+paddleWidth/2);
+        distance/=(paddleWidth/11);
+        velX=distance;
+    }
+    public void setToInitialPosition()
+    {
+        this.posX=playingState.getObjectsManager().getPaddleX()+
+                playingState.getObjectsManager().getPaddleWidth()/2;
+        this.posY=playingState.getObjectsManager().getPaddleY()- diameter;
+        setInitialVelocities();
     }
     private void setInitialVelocities()
     {
-        this.velX=0;
-        this.velY=-5-(playingState.getLevel()+1)/2;
+        this.velX=4;
+        this.velY=-5-(playingState.getLevel()+1)/2-(playingState.getDifficulty()-1)*2;
         move=false;
     }
     public void reverseVelX() {
@@ -93,20 +132,27 @@ public class Ball extends GameObject {
         velY=-velY;
         posY+=velY;
     }
-    public void incrementVelY()//incrementam viteza mingii pe axa OY
+    public void incrementVelY()
     {
         velY+=Math.abs(velY)/velY;
     }
+    public void changeVelX(int val) {
+        if (val < 0) {
+            decreaseVelX(val);
+        } else {
+            increaseVelX(val);
+        }
+    }
     public void increaseVelX(int val)
     {
-        while(velX<=4 && val!=0) { //pe axa OX mingea poate avea viteza in intervalul [-5,5]
+        while(velX<=5 && val!=0) {
             ++velX;
             --val;
         }
     }
     public void decreaseVelX(int val)
     {
-        while(velX>=-4 && val!=0)
+        while(velX>=-5 && val!=0)
         {
             --velX;
             ++val;
@@ -122,5 +168,9 @@ public class Ball extends GameObject {
     }
     public boolean isMoving() {
         return move;
+    }
+    public int getDiameter()
+    {
+        return diameter;
     }
 }

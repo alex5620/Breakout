@@ -1,6 +1,6 @@
 package GameEngine.GameObjects;
 
-import GameEngine.Renderer;
+import GameEngine.Graphics.Renderer;
 import GameEngine.States.PlayState.PlayingState;
 
 import java.util.ArrayList;
@@ -8,89 +8,114 @@ import java.util.ArrayList;
 public class ObjectsManager {
     private PlayingState playingState;
     private ArrayList<GameObject> objects;
-    private Player player;//player-ul si mingea sunt obiecte mai utilizate, de aceea avem o referinta catre ele
-    private Ball ball;    //mai utilizate, in sensul ca functiile acestora sunt apelate mai des
-    public ObjectsManager(PlayingState playing)//de aceea, pentru a nu fi nevoiti sa facem mereu un loop care sa caute
-    {                               //player-ul si mingea, am preferat sa pastrez aceste referinte
+    public ObjectsManager(PlayingState playing)
+    {
         this.playingState = playing;
         objects = new ArrayList<>();
     }
     public void addObject(GameObject object)
     {
         objects.add(object);
-        if(object.getTag().equals("player"))
-        {
-            player=(Player)object;
-        }
-        if(object.getTag().equals("ball"))
-        {
-            ball=(Ball)object;
-        }
     }
     public void update()
     {
-        for (int i = 0; i < objects.size(); ++i) {
-            objects.get(i).update();
-            if (objects.get(i).isDead()) {
-                if((objects.get(i) instanceof Brick)) {
-                    playingState.incremetScore();
-                    generateMagicObjects(objects.get(i).getPosX()+objects.get(i).getWidth()/2, objects.get(i).getPosY()+objects.get(i).getHeight());
-                }                   //daca obiectul distrus este o caramida, atunci se incrementeaza scorul
-                objects.remove(i);  //incrementarea se facem doar daca jocul nu este pierdut
-                i--;                //in sensul ca, atunci cand player-ul pierde, toate obiectele din joc sunt distruse
-            }                       //astfel, trebuie sa se tina seama ca scorul sa fie incrementat corespunzator
+        if(playingState.IsPaused()==false) {
+            for (int i = 0; i < objects.size(); ++i) {
+                objects.get(i).update();
+                if (objects.get(i).isDead()) {
+                    if ((objects.get(i).getTag().equals("brick"))) {
+                        if(((Brick)objects.get(i)).isSpecialBrick())
+                            playingState.increaseScore(2);
+                        else
+                            playingState.increaseScore(1);
+                        int x=objects.get(i).getPosX() + ((Brick) objects.get(i)).getWidth() / 2;
+                        int y=objects.get(i).getPosY() + ((Brick) objects.get(i)).getHeight();
+                        generateMagicObjects(x, y);
+                    }
+                    objects.remove(i);
+                    i--;
+                }
+            }
         }
     }
     public void render(Renderer renderer)
     {
         int size=objects.size();
         for (int i = 0; i < size; ++i) {
-            if (!playingState.getLevelPassed())
+            if (playingState.getLevelPassed()==false)
                 objects.get(i).render(renderer);
             else {
-                if (objects.get(i) instanceof Ball || objects.get(i) instanceof Player)
+                if (objects.get(i) instanceof Ball || objects.get(i) instanceof Paddle)
                     objects.get(i).render(renderer);
-            }                               //de indata ce player-ul a trecut un level, noua mapa este generata,
-        }                                   //dar caramizile nu sunt randate pana cand player-ul
-    }                                       //nu apasa tasta enter de trecere la level-ul urmator
-    public void generateMagicObjects(int x, int y)
-    {
-        ObjectFactory factory=ObjectFactory.getInstance();
-        if(playingState.IsPaused()== true)
-            return;
-        int val=(int)(Math.random()*100);
-        if(val<12) {
-            int val2 = (int) (Math.random() * 9);
-            switch (val2) {
-                case 0:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bigger));
-                    break;
-                case 1:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.smaller));
-                    break;
-                case 2:
-                    addObject(((MagicObject)(factory.getObject(playingState,"magic"))).setDetails(x, y, MagicObject.Type.reverse));
-                    break;
-                case 3:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.slower));
-                    break;
-                case 4:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.faster));
-                    break;
-                case 5:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.life));
-                    break;
-                case 6:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus100));
-                    break;
-                case 7:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus250));
-                    break;
-                case 8:
-                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, MagicObject.Type.bonus500));
-                    break;
             }
         }
+    }
+    public void generateMagicObjects(int x, int y)
+    {
+        ObjectsFactory factory= ObjectsFactory.getInstance();
+        int val=(int)(Math.random()*100);
+        if(val<12) {
+            boolean repeat;
+            do {
+                repeat=false;
+                val = (int) (Math.random() * 10);
+                if(checkIfLaserExists() && val==9 || getPaddle().getSize()==1 && val ==1
+                || getPaddle().getSize()==5 && val ==0)
+                {
+                    repeat=true;
+                }
+            }while(repeat==true);
+            switch (val) {
+                case 0:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 1,1));
+                    break;
+                case 1:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 0, 1));
+                    break;
+                case 2:
+                    addObject(((MagicObject)(factory.getObject(playingState,"magic"))).setDetails(x, y, 3,1));
+                    break;
+                case 3:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 3,0));
+                    break;
+                case 4:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 4,0));
+                    break;
+                case 5:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 4,1));
+                    break;
+                case 6:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 0,0));
+                    break;
+                case 7:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 1, 0));
+                    break;
+                case 8:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 2,0));
+                    break;
+                case 9:
+                    addObject(((MagicObject)(factory.getObject(playingState, "magic"))).setDetails(x, y, 2,1));
+            }
+        }
+    }
+    public boolean checkIfLaserExists()
+    {
+        for(int i=0;i<objects.size();++i)
+        {
+            if(objects.get(i).getTag().equals("laser"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void addLaser()
+    {
+        if(checkIfLaserExists())
+        {
+            return;
+        }
+        objects.add(ObjectsFactory.getInstance().getObject(playingState, "laser"));
     }
     public void destroyAlmostAllBricks()
     {
@@ -100,64 +125,89 @@ public class ObjectsManager {
             }
         }
     }
-    public void destroyAllBonuses()//cand se trece la un nou nivel toate bonusurile se randau pana in acel moment
-    {                              //sunt distruse
+    public void destroyBonusesAndLaser()
+    {
         for(GameObject obj: objects)
         {
-            if(obj.getTag().equals("magic"))
+            if(obj.getTag().equals("magic") || obj.getTag().equals("laser"))
             {
                 obj.setDead(true);
             }
         }
     }
-    public void setPlayerBallToInitial()
+    public void setPaddleBallToInitial()
     {
-        ball.setToInitialPosition();
-        player.setToInitialPosition();
+        getBall().setToInitialPosition();
+        getPaddle().setToInitialPosition();
     }
-    public void setPlayerNormalMovement() {//atunci cand se trece la urmatorul nivel, indiferent de modul in care
-        player.setReversedMovement(false);//player-ul se misca inainte(normal, inversat), acesta se va misca normal
+    public void setPaddleNormalMovement() {
+        getPaddle().setReversedMovement(false);
     }
-    public int getPlayerLives() {
-        return player.getLives();
+    public int getPaddleLives() {
+        return getPaddle().getLives();
     }
-    public void changePlayerLives(int life) {
-        player.changeLivesNo(life);
+    public void changePaddleLives(int life) {
+        getPaddle().changeLivesNo(life);
     }
-    public void setPlayerReversedMovement()
+    public void setPaddleReversedMovement()
     {
-        player.reverseMovement();
+        getPaddle().reverseMovement();
     }
-    public void changePlayerSize(int changeSize)
+    public void changePaddleSize(int changeSize)
     {
-        player.changeSize(changeSize);
+        getPaddle().changeSize(changeSize);
     }
-    public void changePlayerSpeed(int speed)
+    public void changePaddleSpeed(int speed)
     {
-        player.changeSpeed(speed);
+        getPaddle().changeSpeed(speed);
     }
-    public void incrementBallSpeed() {
-        ball.incrementVelY();
-    }
-    public int getPlayerX() {
-        return player.getPosX();
-    }
-    public int getPlayerY() {
-        return player.getPosY();
-    }
-    public int getPlayerWidth() {
-        return player.getWidth();
+    public void incrementBallYVel() {
+        getBall().incrementVelY();
     }
     public ArrayList<GameObject> getObjects()
     {
         return objects;
     }
-    public GameObject getPlayer()
+    public Paddle getPaddle()
     {
-        return player;
+        for(GameObject obj:objects)
+        {
+            if(obj.getTag().equals("paddle"))
+            {
+                return (Paddle)obj;
+            }
+        }
+        return null;
     }
-    public GameObject getBall()
+    public Ball getBall()
     {
-        return ball;
+        for(GameObject obj:objects) {
+            if (obj.getTag().equals("ball")) {
+                return (Ball)obj;
+            }
+        }
+        return null;
+    }
+    public Laser getLaser()
+    {
+        for(GameObject obj:objects) {
+            if (obj.getTag().equals("laser")) {
+                return (Laser)obj;
+            }
+        }
+        return null;
+    }
+    public int getPaddleX() {
+        return getPaddle().getPosX();
+    }
+    public int getPaddleY() {
+        return getPaddle().getPosY();
+    }
+    public int getPaddleWidth() {
+        return getPaddle().getWidth();
+    }
+    public boolean isPaddleMovementReversed()
+    {
+        return getPaddle().isMovementReversed();
     }
 }

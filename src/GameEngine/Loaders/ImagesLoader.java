@@ -1,6 +1,8 @@
 package GameEngine.Loaders;
 
-import GameEngine.Image;
+import GameEngine.Graphics.Image;
+import GameEngine.Graphics.ImageTile;
+
 import java.util.HashMap;
 
 public class ImagesLoader {
@@ -8,47 +10,42 @@ public class ImagesLoader {
     public ImagesLoader()
     {
         images=new HashMap<>();
-        for(int i=0;i<10;++i)
-        {
-            images.put("brick"+i,new Image("/Resources/brick"+i+".png"));
-        }
-        images.put("ball", new Image("/Resources/ball.png"));
-        for(int i=0;i<5;++i)
-        {
-            images.put("player"+(i+1),new Image("/Resources/paddle_size"+(i+1)+".png"));
-        }
-        images.put("background", new Image("/Resources/back2.png"));
-        images.put("menu", new Image("/Resources/menu2.png"));
-        images.put("play", new Image("/Resources/play.png"));
-        images.put("highscores", new Image("/Resources/highscores.png"));
-        images.put("settings", new Image("/Resources/settings.png"));
-        images.put("quit",new Image("/Resources/quit.png"));
-        images.put("settingsmenu",new Image("/Resources/settingsmenu.png"));
-        images.put("back_reset",new Image("/Resources/back.png"));
-        images.put("simplemenu",new Image("/Resources/simplemenu.png"));
-        images.put("highscoresmenu",new Image("/Resources/highscoresmenu.png"));
-        images.put("lostmenu",new Image("/Resources/gameover.png"));
-        images.put("playagain",new Image("/Resources/playagain.png"));
-        images.put("backtomenu",new Image("/Resources/backtomenu.png"));
-        images.put("won", new Image("/Resources/youwon.png"));
-        images.put("backtomenu2",new Image("/Resources/backtomenu2.png"));
-        images.put("reverse", new Image("/Resources/reverse.png"));
-        images.put("bigger", new Image("/Resources/bigger.png"));
-        images.put("smaller", new Image("/Resources/smaller.png"));
-        images.put("slower",new Image("/Resources/slower.png"));
-        images.put("faster",new Image("/Resources/faster.png"));
-        images.put("heart",new Image("/Resources/heart.png"));
-        images.put("life",new Image("/Resources/life.png"));
-        images.put("bonus100", new Image("/Resources/100.png"));
-        images.put("bonus250",new Image("/Resources/250.png"));
-        images.put("bonus500" ,new Image("/Resources/500.png"));
-        images.put("letter",new Image("/Resources/letter.png"));
-        images.put("delete",new Image("/Resources/delete.png"));
-        images.put("pause",new Image("/Resources/pause.png"));
-        images.put("exit",new Image("/Resources/exit.png"));
-        images.put("exit2",new Image("/Resources/exit2.png"));
-        images.put("howtoplay",new Image("/Resources/howToPlay.png"));
-        images.put("about",new Image("/Resources/about.png"));
+        images.put("ball", new Image("/Resources/Images/ball2.png"));
+        images.put("paddle1",new ImageTile("/Resources/Images/paddle_size1.png", 70, 18));
+        images.put("paddle2",new ImageTile("/Resources/Images/paddle_size2.png", 96, 18));
+        images.put("paddle3",new ImageTile("/Resources/Images/paddle_size3.png", 128, 18));
+        images.put("paddle4",new ImageTile("/Resources/Images/paddle_size4.png", 160, 18));
+        images.put("paddle5",new ImageTile("/Resources/Images/paddle_size5.png", 192, 18));
+        images.put("background", new Image("/Resources/Images/background.png"));
+        images.put("menu", new Image("/Resources/Images/menu2.png"));
+        images.put("play", new Image("/Resources/Images/play.png"));
+        images.put("highscores", new Image("/Resources/Images/highscores.png"));
+        images.put("settings", new Image("/Resources/Images/settings.png"));
+        images.put("quit",new Image("/Resources/Images/quit.png"));
+        images.put("settingsmenu",new Image("/Resources/Images/settingsmenu.png"));
+        images.put("back_reset",new Image("/Resources/Images/back.png"));
+        images.put("simplemenu",new Image("/Resources/Images/simplemenu.png"));
+        images.put("highscoresmenu",new Image("/Resources/Images/highscoresmenu.png"));
+        images.put("losttext",new Image("/Resources/Images/gotext.png"));
+        images.put("playagain",new Image("/Resources/Images/playagain.png"));
+        images.put("backtomenu",new Image("/Resources/Images/backtomenu.png"));
+        images.put("wontext", new Image("/Resources/Images/wontext.png"));
+        images.put("youwon", new Image("/Resources/Images/won.png"));
+        images.put("letter",new Image("/Resources/Images/letter.png"));
+        images.put("heart",new Image("/Resources/Images/heart.png"));
+        images.put("delete",new Image("/Resources/Images/delete.png"));
+        images.put("pause",new Image("/Resources/Images/pause.png"));
+        images.put("exit",new Image("/Resources/Images/exit.png"));
+        images.put("exit2",new Image("/Resources/Images/exit2.png"));
+        images.put("howtoplay",new Image("/Resources/Images/howToPlay.png"));
+        images.put("about",new Image("/Resources/Images/about.png"));
+        images.put("laser",new Image("/Resources/Images/laser.png"));
+        images.put("checked", new Image("/Resources/Images/checked.png"));
+        images.put("soundenabled", new Image("/Resources/Images/soundenabled.png"));
+        images.put("sounddisabled", new Image("/Resources/Images/sounddisabled.png"));
+        images.put("bricks", new ImageTile("/Resources/Images/bricks.png", 88, 44));
+        images.put("sbricks", new ImageTile("/Resources/Images/smallbricks.png", 76, 38));
+        images.put("bonuses", new ImageTile("/Resources/Images/bonuses.png", 40, 20));
     }
     public Image getImage(String image)
     {
